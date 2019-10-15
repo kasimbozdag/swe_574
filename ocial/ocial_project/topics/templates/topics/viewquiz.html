@@ -1,0 +1,120 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<div class="container-fluid" style="margin-top:40px;">
+
+
+
+    <div class="row">
+
+        <div class="col">
+
+        {% if error %}
+
+             <p style="color:red;" class="text-center"> {{error}} </p>
+
+        {%endif%}
+
+
+        {% if message %}
+
+             <p style="color:green;" class="text-center"> {{message}} </p>
+
+        {%endif%}
+
+            <small>{{quiz.section.course}} / {{quiz.section}} </small>
+            <h3>{{quiz.title}}</h3> 
+
+            <form method="POST" action="{% url 'viewquiz' quiz.id %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+            {% for question in quiz.question_set.all %}
+                <div class="card" style="margin-top:40px;">
+                    <h5 class="card-header">{{question}}</h5>
+                    <ul class="list-group list-group-flush">
+                        {% for choice in question.choice_set.all %}
+                        <li class="list-group-item">
+                            
+                            {%if givenanswers%}
+
+
+                            {{choice.title}} 
+
+                            {%if choice in correctanswers and choice in givenanswers%}
+                            <i class="fas fa-check" style="color:green;"></i>
+                            {%elif choice in correctanswers%}
+                            <i class="fas fa-check" style="color:green;"></i>
+                            {%elif choice in givenanswers%}
+                            <i class="fas fa-times"style="color:red;"></i> 
+                            {%endif%}
+
+
+
+
+                            {%else%}
+                            <input type="radio" name="choice-radio-{{question.id}}" value="{{choice.id}}"> {{choice.title}}
+                            {%endif%}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        
+            <br />
+
+
+
+                {%if givenanswers%}
+
+                    {% if quiz == learningpath|last %}
+
+                    <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger" value="True">Finish Section</button>
+
+                    {%else%}
+
+                    <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_quiz" class="btn btn-danger"value="True" >Next <i class="fa fa-chevron-right"></i></button>
+
+
+                    {%endif%}
+
+                {%else%}
+
+                <button type="submit" style="float:right;margin-bottom: 30px;" name="complete_quiz" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
+
+                {%endif%}
+
+
+            </form>
+
+        </div>
+
+        <div class="col-lg-3">
+
+            {% if quiz.section.isLinked == False %} 
+                {% include "../temp/lp_section_not_linked.html" %} 
+            {% elif quiz.section.isLinked == True %} 
+                {% include "../temp/lp_section_is_linked.html" %} 
+            {% endif %}
+
+            <br />
+
+            <ul class="list-group">
+
+                {% for resource in quiz.section.resource_set.all %}
+                <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                {% endfor %}
+
+            </ul>
+            <br />
+
+            <a href="{% url 'viewglossary' quiz.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+
+
+            <a href="{% url 'viewcourse' quiz.section.course.id %}" class="btn btn-danger btn-block ">Exit</a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{%endblock%}

@@ -1,0 +1,73 @@
+{% extends '../temp/classroom_base.html' %} {% block content %}
+
+<div id="content-wrapper">
+
+    <div class="container">
+
+        {% if error %}
+
+        <p style="color:red;" class="text-center"> {{error}} </p>
+
+        {%endif%}
+
+        <div class="row">
+
+            <div class="col">
+
+                <form method="POST" action="{% url 'profile' %}">
+
+                    {% csrf_token %}
+
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                        </div>
+                        <input class="form-control" placeholder="Username" type="text" value="{{profile_owner.username}}" name="username">
+                    </div>
+                    <!-- form-group// -->
+
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                        </div>
+                        <input class="form-control" placeholder="First Name" type="text" value="{{profile_owner.first_name}}" name="firstname">
+                    </div>
+                    <!-- form-group// -->
+
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+                        </div>
+                        <input class="form-control" placeholder="Last Name" value="{{profile_owner.last_name}}" type="text" name="lastname">
+                    </div>
+                    <!-- form-group// -->
+
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"> <i class="fa fa-envelope"></i> </span>
+                        </div>
+                        <input class="form-control" placeholder="Email Address" type="email" value="{{profile_owner.email}}" name="email">
+                    </div>
+                    <!-- form-group// -->
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-danger btn-block">Update</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-lg-3">
+
+                <ul class="list-group">
+                    <li class="list-group-item"><a href="{% url 'profile'%}">Profile</a> </li>
+                    <li class="list-group-item"><a href="{% url 'changepassword' %}">Change Password</a> </li>
+
+                </ul>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{%endblock%}

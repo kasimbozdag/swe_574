@@ -1,0 +1,27 @@
+{% load static %} {% load my_tags %}
+
+<ul class="list-group">
+    {% for pathitem in learningpath %} {% if pathitem|verbose_name == "Lecture" %}
+
+    <li class="list-group-item">
+
+        <a href="{% url 'viewlecture' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a> {%if pathitem in lir_finished %}
+        <i class="fas fa-check" style="color:green;"></i> {%endif%}
+
+    </li>
+
+    {%elif pathitem|verbose_name == "Quiz" %}
+
+    <li class="list-group-item"><a href="{% url 'viewquiz' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a> {%if pathitem in lir_finished %}
+        <i class="fas fa-check" style="color:green;"></i> {%endif%}
+
+    </li>
+
+    {%endif%} {% endfor %}
+
+</ul>
+
+<br />
+
+
+

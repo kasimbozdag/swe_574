@@ -1,0 +1,239 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RubaXa/Sortable/Sortable.min.js"></script>
+
+<style type="text/css">
+    .grid {
+        position: relative;
+    }
+    
+    .item {
+        display: block;
+        position: absolute;
+        width: 100%;
+        z-index: 1;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd
+    }
+    
+    .item.muuri-item-dragging {
+        z-index: 3;
+    }
+    
+    .item.muuri-item-releasing {
+        z-index: 2;
+    }
+    
+    .item.muuri-item-hidden {
+        z-index: 0;
+    }
+    
+    .item-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'editsection' section.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-sm-8">
+                    {% if section.id %}<small>{{section.course}}</small>{% endif %}
+                    <input type="text" class="form-control" name="sectionname" placeholder="Section Name" value="{{ section.name }}">
+
+                    <br />
+
+                    <textarea type="text" class="form-control" name="sectiondescription" rows="4" placeholder="Section Description">{{ section.description }}</textarea>
+
+                    <div class="modal fade" id="lectureModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New Learning Path Item</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <form>
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" name="itemtitle" placeholder="Title">
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
+                                    <button type="submit" name="newquiz" class="btn btn-danger "><i class="fas fa-question"></i> New Quiz </button>
+                                    <button type="submit" name="newlecture" class="btn btn-danger "><i class="fas fa-chalkboard-teacher"></i> New Lecture</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {%if section.isLinked == True%}
+                    <input type="checkbox" name="sectionislinked" value="True" checked> Linked Section {% elif section.isLinked == False%}
+                    <input type="checkbox" name="sectionislinked" value="True"> Linked Section 
+                    {% endif %}
+                    <br />
+                    <br />
+
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#lectureModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Quiz/Lecture</button>
+
+                    <input type="hidden" name="lp-order" id="lp-order">
+
+                    <ul class="grid">
+
+                        {% for pathitem in learningpath %} 
+
+                        {%if pathitem|verbose_name == "Lecture" %}
+
+                        <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editlecture' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                            <i class="fas fa-check" style="color:green;"></i> 
+
+
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                            {%else%}
+
+                            <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+
+                                {%if pathitem.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
+
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                                {%endif%}
+
+                            </li>
+
+                            {% endfor %}
+                    </ul>
+
+                    <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
+                    <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+                    <script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+
+                </div>
+
+                <div class="col-sm-4">
+
+                    {% if section.id %}
+
+                    <br />
+
+                    <div class="modal fade" id="resourceModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">New Resource</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        <input type="text" class="form-control" name="resourcename" placeholder="Resource Name">
+                                    </div>
+                                    <div class="form-group">
+                                        <input type="file" class="form-control-file" name="resource">
+                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                    <button type="submit" name="addresource" class="btn btn-danger"><i class="fas fa-plus"></i> Add Resource</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
+
+                    <ul class="list-group mt-4">
+                        {% for resource in section.resource_set.all %}
+                        <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
+
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                        </li>
+                        {% endfor %}
+
+                    </ul>
+
+                    <br /> {% endif %}
+
+                    <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+
+                    
+                    {% if section.id %}
+
+                    {% if section.isPublishable == True %}
+
+                    <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
+
+                    {%else%}
+
+                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-danger btn-block">Save and Exit</button>
+
+                    {% endif %}
+
+
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        var grid = new Muuri('.grid', {
+            dragEnabled: true,
+            dragAxis: 'y'
+        });
+
+        document.getElementById("save_section").onclick = function() {
+            sendLPOrder()
+        };
+
+        document.getElementById("submit_section").onclick = function() {
+            sendLPOrder()
+        };
+
+        function sendLPOrder() {
+
+            var lp_order = document.getElementById("lp-order");
+            lp_order.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
+            lp_order.form.submit();
+
+        }
+    </script>
+
+    <script type="text/javascript">
+        
+        document.getElementById("save_exit_section").onclick = function() {
+            sendLPOrder()
+        };
+    </script>
+
+</div>
+
+{%endblock%}

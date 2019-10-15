@@ -1,0 +1,12 @@
+Babel==2.6.0
+certifi==2019.3.9
+chardet==3.0.4
+Django==2.2
+idna==2.8
+Pillow==6.0.0
+psycopg2-binary==2.8
+pytz==2018.9
+requests==2.21.0
+sqlparse==0.3.0
+urllib3==1.24.2
+Wikidata==0.6.1

@@ -1,0 +1,43 @@
+<div class="container" style="margin-top:20px;">
+
+   {% for lcr in lcr %}
+    
+    <div class="card mb-3" style="max-width: 1200px; max-height: 550px;">
+        <div class="row no-gutters">
+            <div class="col-md-4" >
+                <img style="object-fit: cover; height: 230px;" src="{{ lcr.course.image.url }}"  class="card-img rounded-0" >
+            </div>
+            <div class="col-md-8 ">
+                <div class="card-header">
+
+
+                   <small class="text-muted "><a href="{%url 'exploretopic' lcr.course.topic.id %}">{{ lcr.course.topic }}</a></small>
+                    
+                    <button style="float: right; margin-top: -6px;" type="button" onclick="window.location.href='{% url 'unenrollcourse' lcr.course.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i> Unenroll</button>
+
+                </div>
+                <div class="card-body ">
+                    <a href="{% url 'viewcourse' lcr.course.id %} "><h5 class="card-title ">{{ lcr.course.title }}</h5></a>
+                    <p class="card-text ">{{ lcr.course.summary }}</p>
+
+                    {%if lcr in lcr_finished %}
+
+                    <div class="progress">
+                     <div class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}% Completed</div>
+                    </div>
+
+                    {%else%}
+
+                    <div class="progress">
+                     <div class="progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{lcr.completeRate}}%;" aria-valuenow="{{lcr.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{lcr.completeRate}}%</div>
+                    </div>
+                    {%endif%}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+
+</div>

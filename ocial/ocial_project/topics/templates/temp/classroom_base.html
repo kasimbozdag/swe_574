@@ -1,0 +1,174 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    {% load static %}
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ocial - My Classroom</title>
+
+    <!-- Custom fonts for this template-->
+    <link href="{% static 'vendor/fontawesome-free/css/all.min.css' %}" rel="stylesheet" type="text/css">
+
+    <!-- Page level plugin CSS-->
+
+    <!-- Custom styles for this template-->
+    <link href="{% static 'css/sb-admin.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+    <style type="text/css">
+        .btn-danger {
+            color: #fff;
+            background-color: #EE514D;
+            border-color: #EE514D
+        }
+        
+        .btn-primary:hover {
+            color: #fff;
+            background-color: #bf423e;
+            border-color: #bf423e
+        }
+        
+        a {
+            color: #EE514D;
+        }
+        
+        a:hover {
+            color: #bf423e;
+        }
+        
+        .card,
+        .btn,
+        .form-control {
+            border-radius: 0;
+        }
+    </style>
+
+</head>
+
+<body id="page-top">
+
+    <nav class="navbar navbar-expand fixed-top navbar-dark bg-dark static-top">
+
+        <a class="navbar-brand" href="{%url 'home'%}">
+            <img src="{% static 'ocial_classroom_logo.png' %}" class="d-inline-block align-top" height="60px" />
+        </a>
+
+        <button class="btn btn-link btn-sm text-white order-1 order-sm-0" id="sidebarToggle" href="#">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Navbar Search -->
+        <form class="d-none d-md-inline-block form-inline ml-auto mr-0 mr-md-3 my-2 my-md-0">
+        </form>
+
+        <!-- Navbar -->
+        <ul class="navbar-nav ml-auto ml-md-0">
+            <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-user-circle fa-fw"></i>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
+                    <a class="dropdown-item" href="{% url 'profile' %}">{{user.username}}</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">Logout</a>
+                </div>
+            </li>
+        </ul>
+
+    </nav>
+
+    <div id="wrapper" style="margin-top:85px;">
+
+    <ul class="sidebar navbar-nav" style="position: sticky;">
+    {%if learner %}<li class="nav-item">{%elif teacher%}<li class="nav-item">{%elif profile_owner%}<li class="nav-item">{%else%}<li class="nav-item active"> {%endif%}
+        <a class="nav-link" href="{% url 'classroom' %}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Dashboard</span>
+        </a>
+    </li>
+    {%if learner %}<li class="nav-item active"> {%else%}<li class="nav-item">{%endif%}
+        <a class="nav-link" href="{% url 'learner' %}">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Learner</span></a>
+    </li>
+    {%if teacher %}<li class="nav-item active"> {%else%}<li class="nav-item">{%endif%}
+        <a class="nav-link" href="{% url 'teacher' %}">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <span>Teacher</span></a>
+    }
+    }
+    </li>
+</ul>
+
+ {% block content %} {%endblock%}
+
+    </div>
+
+    <!-- /.container-fluid -->
+
+    <!-- Sticky Footer 
+      <footer class="sticky-footer"style="background: #fff">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+          <span><img src="{% static 'ocial_grey.png' %}" height="30px" /></span>
+          </div>
+        </div>
+      </footer>
+-->
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    </div>
+    <!-- /#wrapper -->
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
+
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                    <a class="btn btn-danger" href="javascript:{document.getElementById('logout').submit()}">Logout</a>
+                    <form id="logout" method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <input type="hidden" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap core JavaScript-->
+    <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script src="{% static 'vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{% static 'vendor/jquery-easing/jquery.easing.min.js' %}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{% static 'js/sb-admin.js' %}"></script>
+
+
+</body>
+
+</html>

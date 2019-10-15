@@ -1,0 +1,14 @@
+{% extends 'base.html' %} {% block content %} {% load staticfiles %}
+
+<div class="container">
+
+    <img style="width:100%;" id="home_image" src="{% static 'home_image.png' %}"> 
+    {% include "../temp/topics_list.html" %}
+
+    <div class="wrapper" style="text-align: center;">
+        <button align="center" onclick="window.location.href = '{% url 'topics' %}';" class="btn btn-danger">Explore More Topics</button>
+    </div>
+
+</div>
+
+{%endblock%}

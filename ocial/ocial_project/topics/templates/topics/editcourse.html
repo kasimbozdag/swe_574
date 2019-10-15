@@ -1,0 +1,227 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RubaXa/Sortable/Sortable.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
+
+<style type="text/css">
+    .grid {
+        position: relative;
+    }
+    
+    .item {
+        display: block;
+        position: absolute;
+        width: 100%;
+        z-index: 1;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd
+    }
+    
+    .item.muuri-item-dragging {
+        z-index: 3;
+    }
+    
+    .item.muuri-item-releasing {
+        z-index: 2;
+    }
+    
+    .item.muuri-item-hidden {
+        z-index: 0;
+    }
+    
+    .item-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'editcourse' course.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}"> {% if course.id %}
+                    <input type="hidden" name="section-order" id="section-order">
+
+                    <ul class="list-group mt-4" id="demo2">
+                        <div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">New Section</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" name="newsection" class="btn btn-danger"><i class="fas fa-folder-plus"></i> New Section</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#sectionModal" data-whatever="@getbootstrap"><i class="fas fa-folder-plus"></i> New Section</button>
+
+                        <ul class="grid">
+
+                            {% for section in course.section_set.all %}
+                            <li class="item" data-id={{section.id}}><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a> 
+
+                                {%if section.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
+
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                            </li>
+
+                            {% endfor %}
+                        </ul>
+
+                    </ul>
+
+                    <script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
+                    <script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+                    <script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+                    {% endif %}
+
+                    <br />
+
+                    <textarea type="text" class="form-control" name="description" rows="4" placeholder="Course Description">{{ course.description }}</textarea>
+                    <br />
+
+                    <textarea name="wywl" id="wywl">{{ course.wywl }}</textarea>
+                    <script>
+                        $('#wywl').summernote({
+                            placeholder: 'What they will learn?',
+                            tabsize: 2,
+                            height: 300
+                        });
+                        $('.dropdown-toggle').dropdown()
+                    </script>
+
+                </div>
+
+                <div class="col-sm-4">
+                    {% if course.image %}
+                    <button type="submit" name="addglossary" class="btn btn-danger btn-block"><i class="fas fa-plus"></i> Add Glossary</button>
+                    <br />
+
+                    <img src="{{ course.image.url }}" style="width:100%; height: auto"> 
+                    {% endif %}
+                    Course Image
+                    <input type="file" class="form-control-file" name="image">
+                    <br />
+                    <label for="exampleFormControlSelect1">Topic</label>
+                    <select class="form-control" name="topic">
+                        <option disabled selected>Select topic</option>
+                        {% for topic in topics.all %} 
+                        {% if topic.id == course.topic.id %}
+                        <option selected value="{{ topic.id }}">{{ topic }}</option>
+                        {% else %}
+                        <option value="{{ topic.id }}">{{ topic }}</option>
+                        {% endif %} 
+                        {% endfor %}
+                    </select>
+                    <br />
+
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
+                            </div>
+                        </div>
+
+                    <br /> 
+                    {% for label in course.label.all %}
+                    <button type="button" onclick="window.location.href='{% url 'deletelabel' course.id label.id %}';" class="badge badge-pill badge-dark" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ label.name }}</button>
+
+                    {% endfor %}
+
+                    <input type="text" class="form-control" name="labels" placeholder="Labels">
+
+                    <br /> {% if course.id %} {% if course.published == True %}
+                    <small>Published at: {{course.pub_date_exact}} <a href="{% url 'coursedetail' course.id %}" target="_blank">View Course</a></small> 
+                    {% else %}
+                    <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
+
+                    <br />
+
+                    <button type="submit" name="save" id="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+
+                    <button type="submit" name="save_exit" id="save_exit" class="btn btn-danger btn-block"> Save and Exit</button>
+                    
+                    {% if course.id %}
+
+                    {% if course.isPublishable == True %}
+                    <button type="submit" name="publish" id="publish" class="btn btn-danger btn-block">Publish</button>
+                    {% endif %}
+
+
+                    <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-danger btn-block"><i class="far fa-trash-alt"></i> Delete</button>
+
+
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        var grid = new Muuri('.grid', {
+            dragEnabled: true,
+            dragAxis: 'y'
+        });
+
+        document.getElementById("save").onclick = function() {
+            sendSectionOrder()
+        };
+
+        document.getElementById("publish").onclick = function() {
+            sendSectionOrder()
+        };
+
+        function sendSectionOrder() {
+
+            var order = document.getElementById("section-order");
+            order.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
+            order.form.submit();
+
+        }
+    </script>
+
+    <script type="text/javascript">
+        document.getElementById("save_exit").onclick = function() {
+            sendSectionOrder()
+        };
+    </script>
+
+</div>
+
+{%endblock%}

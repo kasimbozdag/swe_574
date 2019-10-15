@@ -1,0 +1,60 @@
+{% extends '../temp/classroom_base.html' %} {% block content %}
+
+<style type="text/css">
+    @media (min-width: 990px) {
+        .card-columns {
+            column-count: 4;
+        }
+    }
+</style>
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+        <div class="card mb-3" style="margin-top:10px;">
+            <div class="card-header">
+                <i class="fas fa-fw fa-tachometer-alt"></i> Dashboard
+            </div>
+
+        <div class="card-columns" style="margin: 20px;">
+            {% for course in courses %}
+
+            <div class="card">
+                <img style="object-fit: cover; height: 150px;" src="{{ course.image.url }}" class="card-img rounded-0">
+
+                <div class="card-body">
+                    <a href="{% url 'coursestatistics' course.id %}"><h5 class="card-title">{{course.title}}</h5></a>
+
+                    <div class="progress">
+
+                        {%if course.completeRate == 100 %}
+
+                        <div class="progress-bar progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{course.completeRate}}%;" aria-valuenow="{{course.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{course.completeRate}}%</div>
+
+                        {%else%}
+                        <div class="progress-bar progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{course.completeRate}}%;" aria-valuenow="{{course.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{course.completeRate}}%</div>
+                        {%endif%}
+
+                    </div>
+
+                    <small>
+                    {{course.numberofLearners}} 
+                    {%if course.numberofLearners == 1%}
+                    learner
+                    {%else%}
+                    learners
+                    {%endif%}
+                    </small>
+                </div>
+            </div>
+            {% endfor %}
+
+</div>
+</div>
+        </div>
+
+    </div>
+</div>
+
+{%endblock%}

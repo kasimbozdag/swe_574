@@ -1,0 +1,61 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    <div class="row">
+
+        <div class="col">
+
+            <small>{{lecture.section.course}} / {{lecture.section}} </small>
+            <h3>{{lecture.title}}</h3>
+
+            <p>{{lecture.body | safe}}</p>
+
+            <form method="POST" action="{% url 'viewlecture' lecture.id %}" enctype="multipart/form-data">
+        	{% csrf_token %}
+
+
+
+            {% if lecture == learningpath|last %}
+
+                <button type="submit" style="float:right;margin-bottom: 30px;" name="finish_section" class="btn btn-danger">Finish Section</button>
+
+            {%else%}
+            
+                <button type="submit" style="float:right; margin-bottom: 30px;" name="finish_lecture" class="btn btn-danger">Next <i class="fa fa-chevron-right"></i></button>
+
+            {%endif%}
+            
+            </form>
+
+        </div>
+
+        <div class="col-lg-3">
+        	{% if lecture.section.isLinked == False %}
+            {% include "../temp/lp_section_not_linked.html" %}
+            {% elif lecture.section.isLinked == True %}
+            {% include "../temp/lp_section_is_linked.html" %}
+            {% endif %}
+
+            <br />
+
+            <ul class="list-group">
+
+                {% for resource in lecture.section.resource_set.all %}
+                <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                {% endfor %}
+
+            </ul>
+            <br />
+
+            <a href="{% url 'viewglossary' lecture.section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+
+            <a href="{% url 'viewcourse' lecture.section.course.id %}" class="btn btn-danger btn-block ">Exit</a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{%endblock%}

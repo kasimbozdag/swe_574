@@ -1,0 +1,79 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% block content %}
+
+<style type="text/css">
+    @media (min-width: 992px) {
+        .card-columns {
+            column-count: 4;
+        }
+    }
+</style>
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'glossary' course.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <h2>Glossary</h2>
+            <p>{{course.title}}</p>
+
+            <div class="row">
+                <div class="col-md-10">
+                    <input class="form-control" type="text" placeholder="Search" name="search_glossary">
+                </div>
+
+                <div class="col-md-2">
+                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block" >Submit</a>
+                </div>
+            </div>
+
+            <ul class="list-group mt-4" id="demo2">
+
+                {%if r_json %} 
+                {% for glossary in r_json %}
+
+                <div class="list-group">
+                    <p class="list-group-item clearfix" style="margin-bottom:5px;">
+                        {{glossary.label}} <small>(<a href="{{glossary.url}}" target="_blank">{{ glossary.title}}</a>)</small> {%if glossary.description %}<small class="card-text">: {{ glossary.description }}</small>{%endif%}
+
+                        <span class="pull-right">
+                            <a href="{% url 'newglossary' course.id glossary.id %}" class="btn btn-danger" ><i class="fas fa-plus"></i></a>
+                    </span>
+                    </p>
+                </div>
+
+                {% endfor %} {%endif%}
+
+                <div class="card-columns">
+                    {% for glossary in course.glossary_set.all %}
+
+                    <div class="card">
+                        {% if glossary.image_url %}<img class="card-img-top" src="{{glossary.image_url}}" >{% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{glossary.name}}</h5>
+                            <p class="card-text">{{glossary.description}}</p>
+                            <a href="{{glossary.url}}" target="_blank" class="btn  btn-danger"><i class="fab fa-wikipedia-w"></i></a>
+                            <a href="{% url 'deleteglossary' glossary.id %}" style="float: right;" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+            </ul>
+
+        </div>
+
+    </form>
+
+</div>
+
+{%endblock%}

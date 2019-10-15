@@ -1,0 +1,193 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/RubaXa/Sortable/Sortable.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+
+<script src="https://unpkg.com/web-animations-js@2.3.1/web-animations.min.js"></script>
+<script src="https://unpkg.com/hammerjs@2.0.8/hammer.min.js"></script>
+<script src="https://unpkg.com/muuri@0.7.1/dist/muuri.min.js"></script>
+
+<style type="text/css">
+    .grid {
+        position: relative;
+    }
+    
+    .item {
+        display: block;
+        position: absolute;
+        width: 100%;
+        z-index: 1;
+        padding: 10px 15px;
+        margin-bottom: -1px;
+        background-color: #fff;
+        border: 1px solid #ddd
+    }
+    
+    .item.muuri-item-dragging {
+        z-index: 3;
+    }
+    
+    .item.muuri-item-releasing {
+        z-index: 2;
+    }
+    
+    .item.muuri-item-hidden {
+        z-index: 0;
+    }
+    
+    .item-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+</style>
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'editquiz' quiz.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+
+            <div class="row">
+                <div class="col-sm-8">
+
+                    {% if quiz.id %}                    
+                    <small>{{quiz.section.course}} / {{quiz.section}}</small>
+                    {% endif %}
+                    <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title" value="{{ quiz.title }}">
+
+                    <input type="hidden" name="question-order" id="question-order">
+
+                    <ul class="list-group mt-4" id="demo2">
+                        <div class="modal fade" id="questionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">New Question</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <textarea type="text" class="form-control" name="questiontitle" placeholder="Question" rows=4></textarea>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" name="newquestion" class="btn btn-danger"><i class="fas fa-question"></i> New Question</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#questionModal" data-whatever="@getbootstrap"><i class="fas fa-question"></i> New Question</button>
+
+                        <ul class="grid">
+
+                            {% for question in quiz.question_set.all %}
+                            <li class="item" data-id={{question.id}}><a href="{% url 'editquestion' question.id %}">Question {{question.order}}: {{question.title}}</a>
+
+                                {%if question.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> 
+                                {%endif%}
+
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+
+                            </li>
+
+                            {% endfor %}
+                        </ul>
+                    </ul>
+
+                </div>
+
+                <div class="col-sm-4">
+
+                    <br />
+                    <div class="form-inline">
+
+                        <div class="form-group ">
+                            Passing Score:</div>
+                        <div class="form-group ">
+
+                            <input type="number" class="form-control" name="quizsuccessrate" min="0" max="100" value="{{quiz.successrate}}">%
+                        </div>
+                    </div>
+
+                    <br />
+
+                    <button type="submit" name="save_quiz" id="save_quiz" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+
+                    {% if quiz.id %}
+                    
+                    {%if quiz.isPublishable == True%}
+
+                    <button type="submit" name="submit_quiz" id="submit_quiz" class="btn btn-danger btn-block">Submit</button>
+
+                    {%else%}
+
+                    <button type="submit" name="save_exit_quiz" id="save_exit_quiz" class="btn btn-danger btn-block">Save and Exit</button>
+
+                    {%endif%}
+
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' quiz.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Quiz</button>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+
+    </form>
+
+    <script type="text/javascript">
+        var grid = new Muuri('.grid', {
+            dragEnabled: true,
+            dragAxis: 'y'
+        });
+
+        document.getElementById("save_quiz").onclick = function() {
+            sendQuestionOrder()
+        };
+
+                document.getElementById("submit_quiz").onclick = function() {
+            sendQuestionOrder()
+        };
+
+
+        function sendQuestionOrder() {
+
+            var questionorder = document.getElementById("question-order");
+            questionorder.value = grid.getItems().map(item => item.getElement().getAttribute('data-id'));
+            questionorder.form.submit();
+
+        }
+
+    </script>
+
+    <script type="text/javascript">
+
+
+        document.getElementById("save_exit_quiz").onclick = function() {
+            sendQuestionOrder()
+        };
+
+    </script>
+
+</div>
+
+{%endblock%}

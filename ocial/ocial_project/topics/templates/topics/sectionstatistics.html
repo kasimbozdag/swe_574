@@ -1,0 +1,67 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<style type="text/css">
+    @media (min-width: 990px) {
+        .card-columns {
+            column-count: 5;
+        }
+    }
+</style>
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+    {% for item in learningpath|slice:":1" %}
+
+    <div class="row" style="background-color: #efefef;margin-bottom: 20px;">
+        <div class="col-lg-4"><img style="object-fit: cover; width: 100%;" src="{{item.section.course.image.url}}" height="250"></div>
+
+        <div class="col">
+            <h1>{{item.section.course.title}}</h1>
+            <p>{{item.section.course.description}}</p>
+            <h5>Section {{item.section.order}}: {{item.section.name}}</h5>
+        </div>
+    </div>
+    {%endfor%}
+
+
+
+        <div class="card-columns">
+            {% for item in learningpath %}
+
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-title">{{item.order}}. {{item|verbose_name}}: {{item.title}}</h6>
+
+                    
+                    <div class="progress">
+
+                        {%if item.completeRate == 100 %}
+
+                        <div class="progress-bar progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{item.completeRate}}%;" aria-valuenow="{{item.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{item.completeRate}}%</div>
+
+                        {%else%}
+                        <div class="progress-bar progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{item.completeRate}}%;" aria-valuenow="{{item.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{item.completeRate}}%</div>
+                        {%endif%}
+
+                    </div>
+                
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+
+        {% for item in learningpath|slice:":1" %}
+
+
+        <a href="{% url 'coursestatistics' item.section.course.id %}" style="float:right; margin-bottom: 100px;" class="btn btn-danger">Back</a>
+
+        {%endfor%}
+
+
+    </div>
+</div>
+
+{%endblock%}

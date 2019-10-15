@@ -1,0 +1,68 @@
+{% extends 'base.html' %} 
+{% block content %} 
+{% load static %}
+
+<!-- Bootstrap core CSS -->
+
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-6">
+            <small>{{ course.pub_date }}</small>
+            <h1 class="card-title">{{ course.title }}</h1>
+            <p>{{ course.description }}</p>
+            <h3>What you will learn?</h3> {{ course.wywl | safe }}
+        </div>
+
+        <div class="col-6">
+            <div class="card" >
+                <img class="card-img-top rounded-0" src="{{ course.image.url }}" alt="Card image cap">
+                <ul class="list-group list-group-flush">
+                    {%if course.teacher == user %}
+                    <a href="{% url 'editcourse' course.id %}" class="btn btn-danger btn-block">Edit Course</a>
+                    {% elif user.username in learners %}
+                    <a href="{% url 'viewcourse' course.id %}" class="btn btn-danger btn-block">View Course</a>
+                    {% else %}
+                    <a href="{% url 'enrollcourse' course.id %}" class="btn btn-danger btn-block">Enroll</a>
+                    {%endif%}
+                    <li class="list-group-item">
+                        <a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic.title }}</a>
+                    </li>
+                    <li class="list-group-item">Teacher: <a href="{%url 'exploreteacher' course.teacher.id %}">{{ course.teacher.username }}</a></li>
+                </ul>
+                <div class="card-body">
+                    {% for label in course.label.all %}
+                    <a href="{% url 'explorelabel' label.id %}" class="badge badge-pill badge-danger" style="margin-bottom: 5px;">{{ label.name }}</a> {% endfor %}
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <br />
+
+    <div id="accordion">
+        {% for section in course.section_set.all %}
+        <div class="card">
+            <div class="card-header">
+                <a class="card-link" data-toggle="collapse" href="#section{{section.order}}">
+          Section {{section.order}}: {{section.name}}
+        </a>
+            </div>
+            <div id="section{{section.order}}" class="collapse" data-parent="#accordion">
+                <div class="card-body">
+                    {{section.description}}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+<!-- /.container -->
+
+{%endblock%}

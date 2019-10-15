@@ -1,0 +1,56 @@
+{% extends '../temp/classroom_base.html' %} {% block content %}
+
+<style type="text/css">
+    @media (min-width: 990px) {
+        .card-columns {
+            column-count: 4;
+        }
+    }
+</style>
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+    {% for section in sections|slice:":1" %}
+
+    <div class="row" style="background-color: #efefef;margin-bottom: 20px;">
+        <div class="col-lg-4"><img style="object-fit: cover; width: 100%;" src="{{section.course.image.url}}" height="250"></div>
+
+        <div class="col">
+            <h1>{{section.course.title}}</h1>
+            <p>{{section.course.description}}</p>
+        </div>
+    </div>
+    {%endfor%}
+
+
+
+        <div class="card-columns">
+            {% for section in sections %}
+
+            <div class="card">
+                <div class="card-body">
+                    <a href="{% url 'sectionstatistics' section.id %}"><h5 class="card-title">{{section.name}}</h5></a>
+
+                    <div class="progress">
+
+                        {%if section.completeRate == 100 %}
+
+                        <div class="progress-bar progress-bar progress-bar-striped bg-success" role="progressbar" style="width: {{section.completeRate}}%;" aria-valuenow="{{section.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{section.completeRate}}%</div>
+
+                        {%else%}
+                        <div class="progress-bar progress-bar progress-bar-striped progress-bar-animated bg-warning" role="progressbar" style="width: {{section.completeRate}}%;" aria-valuenow="{{section.completeRate}}" aria-valuemin="0" aria-valuemax="100">{{section.completeRate}}%</div>
+                        {%endif%}
+
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        <a href="{% url 'classroom'%}" style="float:right; margin-bottom: 100px;" class="btn btn-danger">Back</a>
+    </div>
+</div>
+
+{%endblock%}

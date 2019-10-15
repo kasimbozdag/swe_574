@@ -1,0 +1,20 @@
+{% extends '../temp/classroom_base.html' %} 
+{% block content %}
+
+<div id="content-wrapper">
+
+    <div class="container-fluid">
+
+        <button onclick="window.location.href = '{% url 'newcourse' %}';" class="btn btn-danger"><i class="fas fa-plus"></i> New Course </button>
+
+        <div class="card mb-3" style="margin-top:10px;">
+            <div class="card-header">
+                <i class="fas fa-chalkboard-teacher"></i> My Courses</div>
+            <div class="card-body">
+                {% include "../temp/teacher_course_list.html" %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{%endblock%}

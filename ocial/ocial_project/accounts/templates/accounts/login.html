@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
+
+<div class="container">
+<br>  
+
+<div class="card bg-light">
+<article class="card-body mx-auto" style="max-width: 400px;">
+
+	{% if error %}
+
+	<p style="color:red;" class="text-center"> {{error}} </p>
+
+	{%endif%}
+
+
+	<h4 class="card-title mt-3 text-center">Login to your account</h4>
+
+
+	<form method="POST" action="{% url 'login' %}">
+
+	{% csrf_token %}
+
+    <div class="form-group input-group">
+        <div class="input-group-prepend">
+            <span class="input-group-text"> <i class="fa fa-user"></i> </span>
+         </div>
+        <input  class="form-control" placeholder="Username" type="text" name="username">
+    </div> <!-- form-group// -->
+
+    <div class="form-group input-group">
+    	<div class="input-group-prepend">
+		    <span class="input-group-text"> <i class="fa fa-lock"></i> </span>
+		</div>
+        <input class="form-control" placeholder="Password" type="password" name="password">
+    </div> <!-- form-group// -->
+                                    
+    <div class="form-group">
+        <button type="submit" class="btn btn-danger btn-block">Login</button>
+    </div> <!-- form-group// -->  
+     <p class="text-center">Does not have an account? <a href="{% url 'signup' %}">Sign up</a> </p>   
+        
+    <input type="hidden" name="next" value="{{ request.GET.next }}"/>
+
+
+</form>
+</article>
+</div> <!-- card.// -->
+
+</div> 
+
+
+{%endblock%}
+

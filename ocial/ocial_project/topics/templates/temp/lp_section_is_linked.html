@@ -1,0 +1,59 @@
+{% load static %} {% load my_tags %}
+
+<ul class="list-group">
+    {% for pathitem in learningpath %} 
+    {% with previous_pathitem=learningpath|previous:forloop.counter0 %}
+
+    {% if pathitem|verbose_name == "Lecture" %}
+
+    <li class="list-group-item">
+
+        {% if pathitem.order == 1 or pathitem in lir_finished or previous_pathitem in lir_finished %}
+            <a href="{% url 'viewlecture' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a> 
+
+            {%if pathitem in lir_finished %}
+            <i class="fas fa-check" style="color:green;"></i> 
+            {%endif%}
+
+        {% else %}
+
+            <span style="color:grey;">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</span> 
+
+
+        {% endif %}
+
+
+
+    </li>
+
+    {%elif pathitem|verbose_name == "Quiz" %}
+
+
+    <li class="list-group-item">
+
+        {% if pathitem.order == 1 or pathitem in lir_finished or previous_pathitem in lir_finished %}
+
+            <a href="{% url 'viewquiz' pathitem.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a> 
+            {%if pathitem in lir_finished %}
+            <i class="fas fa-check" style="color:green;"></i> 
+            {%endif%}
+        
+        {% else %}
+
+            <span style="color:grey;">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</span> 
+        
+        {% endif %}
+
+    </li>
+
+    {% endif %} 
+
+    {% endwith %}
+    {% endfor %}
+
+</ul>
+
+<br />
+
+
+

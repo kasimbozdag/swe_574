@@ -1,0 +1,46 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% block content %}
+
+<style type="text/css">
+    @media (min-width: 992px) {
+        .card-columns {
+            column-count: 4;
+        }
+    }
+</style>
+
+<div class="container-fluid" style="margin-top:20px;">
+
+        <div class="row" style="background-color: #efefef;margin-bottom: 20px;">
+        <div class="col-lg-4"><img style="object-fit: cover; width: 100%;" src="{{course.image.url}}" height="250"></div>
+
+        <div class="col ">
+            <h1>{{course.title}}</h1>
+            <p>{{course.description}}</p>
+            {% for section in lsr|slice:":1" %}
+            <a href="{% url 'viewsection' section.id %}" class="btn btn-danger">Resume Section {{section.order}}</a>
+            {% endfor %}
+
+            <a href="{% url 'viewcourse' course.id %}" class="btn btn-outline-danger ">Quit</a>
+
+        </div>
+    </div>
+
+    <div class="card-columns">
+                    {% for glossary in course.glossary_set.all %}
+
+                    <div class="card">
+                        {% if glossary.image_url %}<img class="card-img-top" src="{{glossary.image_url}}" alt="Card image cap">{% endif %}
+
+                        <div class="card-body">
+                            <h5 class="card-title">{{glossary.name}}</h5>
+                            <p class="card-text">{{glossary.description}}</p>
+                            <a href="{{glossary.url}}" target="_blank" class="btn  btn-danger"><i class="fab fa-wikipedia-w"></i></a>
+                        </div>
+                    </div>
+                    {% endfor %}
+
+                </div>
+
+</div>
+
+{%endblock%}

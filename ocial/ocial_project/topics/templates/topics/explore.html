@@ -1,0 +1,108 @@
+{% extends 'base.html' %} 
+{% block content %} 
+{% load staticfiles %} 
+
+
+
+{% if error %}
+
+<p style="color:red;" class="text-center"> {{error}} </p>
+
+{%endif%}
+
+{%if topic.id %}
+
+<form id="searchform" action="{% url 'exploretopic' topic.id %}" method="get" accept-charset="utf-8">
+    <div class="container" style="margin-top:120px;">
+        <input class="form-control" type="text" placeholder="Search" name="search_course">
+    </div>
+</form>
+
+{%elif teacher.id%}
+
+
+<form id="searchform" action="{% url 'exploreteacher' teacher.id %}" method="get" accept-charset="utf-8">
+    <div class="container" style="margin-top:120px;">
+        <input class="form-control" type="text" placeholder="Search" name="search_course">
+    </div>
+</form>
+
+{%elif label.id%}
+
+
+<form id="searchform" action="{% url 'explorelabel' label.id %}" method="get" accept-charset="utf-8">
+    <div class="container" style="margin-top:120px;">
+        <input class="form-control" type="text" placeholder="Search" name="search_label">
+    </div>
+</form>
+
+{%else%}
+
+
+<form id="searchform" action="{% url 'explore' %}" method="get" accept-charset="utf-8">
+    <div class="container" style="margin-top:120px;">
+        <input class="form-control" type="text" placeholder="Search" name="search_course">
+    </div>
+</form>
+
+{%endif%}
+
+
+
+
+<div class="container" style="margin-top:20px;">
+
+{%if topic.id %}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<button type="button" onclick="window.location.href='{% url 'explore' %}';" class="badge badge-pill badge-secondary" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ topic.title }}</button>
+
+
+{%elif teacher.id%}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<button type="button" onclick="window.location.href='{% url 'explore' %}';" class="badge badge-pill badge-secondary" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ teacher.get_full_name }}</button>
+
+{%elif label.id%}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<button type="button" onclick="window.location.href='{% url 'explore' %}';" class="badge badge-pill badge-secondary" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ label.name }}</button>
+
+{%endif%}
+
+    <div class="album py-5 bg-light">
+        <div class="container">
+
+            <div class="row">
+
+                {% for course in courses %}
+
+                <div class="col-md-4">
+                    <div style="height: 450px;" class="card mb-4">
+                        <img style="object-fit: cover; height: 200px;" class="card-img-top rounded-0" style="" src="{{ course.image.url }}" />
+                        <div class="card-body">
+                            <a href="{% url 'coursedetail' course.id %}"><h6 class="card-text">{{ course.title }}</h6></a>
+                            <p class="card-text">{{ course.summary }}</p>
+                        </div>
+
+                        <div class="card-footer">
+                            <small class="text-muted"><a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic }}</a></small>
+                            <br />
+                            <small class="text-muted">{{ course.pub_date }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    {%endblock%}

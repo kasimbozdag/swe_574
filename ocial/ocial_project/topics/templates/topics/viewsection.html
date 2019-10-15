@@ -1,0 +1,49 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    <div class="row">
+
+        <div class="col">
+
+
+        </div>
+
+        <div class="col-3">
+
+            <ul class="list-group">
+                {% for pathitem in learningpath %}
+
+                {% if pathitem|verbose_name == "Lecture" %}
+
+                <li class="list-group-item"><a href="{% url 'viewlecture' lecture.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
+
+                {%elif pathitem|verbose_name == "Quiz" %}
+
+                <li class="list-group-item"><a href="{% url 'viewquiz' lecture.id %}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a></li>
+                
+                {%endif%}
+
+                {% endfor %}
+
+            </ul>
+
+            <br />
+
+            <ul class="list-group">
+
+                {% for resource in section.resource_set.all %}
+                <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a></li>
+                {% endfor %}
+
+            </ul>
+
+            <a href="{% url 'viewglossary' section.course.id %}" target="_blank" class="btn btn-outline-danger btn-block ">Glossary</a>
+
+        </div>
+
+    </div>
+
+</div>
+
+{%endblock%}

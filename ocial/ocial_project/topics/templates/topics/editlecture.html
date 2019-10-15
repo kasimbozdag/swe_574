@@ -1,0 +1,66 @@
+{% extends '../temp/classroom_base.html' %} {% load static %} {% load my_tags %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-bs4.js"></script>
+
+
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <p style="color:red;" class="text-center"> {{error}} </p>
+
+    {%endif%}
+
+    <form method="POST" action="{% url 'editlecture' lecture.id %}" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-8">
+
+                    {% if lecture.id %}
+                    <small>{{lecture.section.course}} / {{lecture.section}}</small>
+                    {% endif %}
+                    <input type="text" class="form-control" name="lecturetitle" placeholder="Lecture Title" value="{{ lecture.title }}">
+
+                    <br />
+
+                    <textarea name="lecturebody" id="lecturebody">{{lecture.body}}</textarea>
+                    <script>
+                        $('#lecturebody').summernote({
+                            tabsize: 2,
+                            height: 500
+                        });
+                        $('.dropdown-toggle').dropdown()
+                    </script>
+
+                </div>
+
+                <div class="col-sm-4">
+
+                    <br />
+
+                    <button type="submit" name="save_lecture" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+
+                    {% if lecture.id %}
+
+                    
+                    <button type="submit" name="submit_lecture" class="btn btn-danger btn-block">Submit</button>
+
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' lecture.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Lecture</button>
+
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+{%endblock%}
