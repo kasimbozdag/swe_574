@@ -1,6 +1,8 @@
-# swe_574
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/kasimbozdag/swe_574.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/kasimbozdag/swe_574/context:python)
 
-## How to start the Ocial project
+# SWE574
+
+## How to start the ocial project
 
 ### Local
 
