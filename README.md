@@ -49,8 +49,12 @@ pip install -r requirements.txt
 
 python manage.py migrate
 
+python manage.py collectstatic
+
 python manage.py runserver
 ```
 
 The project should be running now
+
+More detailed guide: https://github.com/onurasiliskender/ocial/wiki/07.-System-Deployment-Guide
 
