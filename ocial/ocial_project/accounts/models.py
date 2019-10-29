@@ -7,3 +7,12 @@ class Learner(models.Model):
 
 	def __str__(self):
 		return self.user.username
+
+
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images/', default= '../static/default.jpg')
+    
+
+    def __str__(self):
+    	return self.user.username

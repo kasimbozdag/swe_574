@@ -1,0 +1,98 @@
+{% extends 'base.html' %} {% block content %} {% load staticfiles %}
+
+<style type="text/css">
+    .thumb1 {
+        object-fit: cover;
+        width: 150px;
+        height: 150px;
+    }
+</style>
+
+<div class="container" style="margin-top:130px;">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-lg-4">
+
+            <div class="card">
+                <div class="card-body text-center">
+                    <div> <img src="{{ userprofile.image.url }}" class="thumb1 rounded-circle mb-4" alt="profile image">
+                        <h4>{{userprofile.user.get_full_name}}</h4>
+                        <p class="text-muted mb-0">@{{userprofile.user.username}}</p>
+                    </div>
+                    {%if requester == userprofile.user %}
+                    <a href="{% url 'editprofile' %}" class="btn btn-danger btn-sm mt-3 mb-4">Edit Profile</a>
+                    {% else %}
+                    <a href="#" class="btn btn-danger btn-sm mt-3 mb-4">Follow</a>
+                    {%endif%}
+                    <div class="border-top pt-3">
+                        <div class="row">
+                            <div class="col-4">
+                                <h6>{{number_of_courses}}</h6>
+                                <p>Course</p>
+                            </div>
+                            <div class="col-4">
+                                <h6>0</h6>
+                                <p>Followers</p>
+                            </div>
+                            <div class="col-4">
+                                <h6>0</h6>
+                                <p>Following</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="col-md-8">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#home">Activities</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu1">Courses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" href="#menu2">Bio</a>
+                </li>
+            </ul>
+
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="home" class="container tab-pane active">
+                    <br>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+                </div>
+                <div id="menu1" class="container tab-pane fade">
+                    <br> {% for course in courses %}
+
+                    <div class="card mb-7" style="margin-bottom:20px; max-height: 450px;">
+                        <div class="row no-gutters">
+                            <div class="col-md-4">
+                                <img style="object-fit: cover; height: 200px;" src="{{ course.image.url }}" class="card-img rounded-0">
+                            </div>
+                            <div class="col-md-8 ">
+                                <div class="card-body ">
+                                    <a href="{% url 'coursedetail' course.id %}"><h5 class="card-title ">{{ course.title }}</h5></a>
+                                    <p class="card-text ">{{ course.summary }}</p>
+                                    <p class="card-text "><small class="text-muted "><a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic }}</a></small></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                </div>
+                <div id="menu2" class="container tab-pane fade">
+                    <br>
+                    <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{%endblock%}

@@ -1,3 +1,4 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -20,6 +21,17 @@ def home(request):
 	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
 	topics = topics[:9]
 	return render(request, 'topics/home.html', {'topics': topics })
+
+def userprofile(request,username):
+	user =  get_object_or_404(User,username=username)
+	userprofile, created = UserProfile.objects.get_or_create(user=user)
+	userprofile.save()
+	courses = Course.objects.filter(teacher = user,published=True)
+	number_of_courses = len(courses)
+
+	return render(request, 'topics/userprofile.html', {'userprofile': userprofile ,'courses':courses, 'number_of_courses':number_of_courses, 'requester': request.user})
+
+
 
 def topics(request):
 	if request.method == 'GET': # If the form is submitted
@@ -163,7 +175,7 @@ def sectionstatistics(request, section_id):
 
 
 @login_required
-def profile(request):
+def editprofile(request):
 	profile_owner = request.user
 
 	if request.method == 'POST':
@@ -176,9 +188,9 @@ def profile(request):
 					profile_owner.last_name = request.POST['lastname']
 					profile_owner.email = request.POST['email']
 					profile_owner.save()
-					return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+					return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
 				else:
-					return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
+					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
 			except:
 				try:
 					user = User.objects.get(email = request.POST['email'])
@@ -188,20 +200,20 @@ def profile(request):
 						profile_owner.last_name = request.POST['lastname']
 						profile_owner.email = request.POST['email']
 						profile_owner.save()
-						return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+						return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
 					else:
-						return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
+						return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
 				except:
 						profile_owner.username = request.POST['username']
 						profile_owner.first_name = request.POST['firstname']
 						profile_owner.last_name = request.POST['lastname']
 						profile_owner.email = request.POST['email']
 						profile_owner.save()
-						return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+						return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
 		else:
-			return render(request, 'topics/profile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
+			return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
 	else:
-		return render(request, 'topics/profile.html',{'profile_owner': profile_owner})
+		return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
 
 @login_required
 def changepassword(request):

@@ -14,7 +14,7 @@
 
             <div class="col">
 
-                <form method="POST" action="{% url 'profile' %}">
+                <form method="POST" action="{% url 'editprofile' %}">
 
                     {% csrf_token %}
 
@@ -59,7 +59,7 @@
             <div class="col-lg-3">
 
                 <ul class="list-group">
-                    <li class="list-group-item"><a href="{% url 'profile'%}">Profile</a> </li>
+                    <li class="list-group-item"><a href="{% url 'editprofile'%}">Profile</a> </li>
                     <li class="list-group-item"><a href="{% url 'changepassword' %}">Change Password</a> </li>
 
                 </ul>
