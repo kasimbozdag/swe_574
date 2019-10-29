@@ -188,7 +188,8 @@ def editprofile(request):
 					profile_owner.last_name = request.POST['lastname']
 					profile_owner.email = request.POST['email']
 					profile_owner.save()
-					return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
+					return redirect('userprofile', username=profile_owner.username)
+
 				else:
 					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
 			except:
@@ -200,7 +201,8 @@ def editprofile(request):
 						profile_owner.last_name = request.POST['lastname']
 						profile_owner.email = request.POST['email']
 						profile_owner.save()
-						return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
+						return redirect('userprofile', username=profile_owner.username)
+
 					else:
 						return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
 				except:
@@ -209,7 +211,8 @@ def editprofile(request):
 						profile_owner.last_name = request.POST['lastname']
 						profile_owner.email = request.POST['email']
 						profile_owner.save()
-						return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
+						return redirect('userprofile', username=profile_owner.username)
+
 		else:
 			return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
 	else:
@@ -228,15 +231,13 @@ def changepassword(request):
 				if request.POST['password'] == request.POST['password2']:
 					profile_owner.set_password(request.POST['password'])
 					profile_owner.save()
+					return redirect('userprofile', username=profile_owner.username)
 				else:
 					return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'New password is not confirmed.'})
 			else:
 				return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'Old password is wrong.'})
 		else:
 			return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'All fields are required.'})
-
-
-
 
 	return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner})
 
