@@ -1,0 +1,49 @@
+
+{% extends 'base.html' %} {% block content %} {% load staticfiles %}
+
+<style type="text/css">
+    .thumb1 {
+        object-fit: cover;
+        width: 150px;
+        height: 150px;
+    }
+</style>
+
+<div class="container" style="margin-top:130px;">
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-lg-4">
+
+                {% include "../temp/user_profile_card.html" %}
+
+
+        </div>
+
+        <div class="col-md-8">
+
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'userfollowers' userprofile.user.username  %}">Followers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" data-toggle="tab" href="#following">Following</a>
+                </li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div id="following" class="container tab-pane active">
+                    <br>
+                    {% for userprofile in following_userprofile %}
+                
+                        {% include "../temp/user_follow_card.html" %}
+                    
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{%endblock%}

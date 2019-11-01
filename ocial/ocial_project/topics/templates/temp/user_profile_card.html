@@ -1,0 +1,32 @@
+            <div class="card">
+                <div class="card-body text-center">
+                    <div> <img src="{{ userprofile.image.url }}" class="thumb1 rounded-circle mb-4" alt="profile image">
+                        <h4>{{userprofile.user.get_full_name}}</h4>
+                        <a href="{% url 'userprofile' userprofile.user.username %}" style="text-decoration : none"><p class="text-muted mb-0">@{{userprofile.user.username}}</p></a>
+                    </div>
+                    {%if requester == userprofile.user %}
+                    <a href="{% url 'editprofile' %}" class="btn btn-danger btn-sm mt-3 mb-4">Edit Profile</a>
+                    {% elif requester in followed_by %}
+                    <a href="{% url 'unfollowuser' userprofile.user.username  %}" class="btn btn-danger btn-sm mt-3 mb-4">Unfollow</a>
+                    {% else %}
+                    <a href="{% url 'followuser' userprofile.user.username  %}" class="btn btn-danger btn-sm mt-3 mb-4">Follow</a>
+                    {%endif%}
+
+                    <div class="border-top pt-3">
+                        <div class="row">
+                            <div class="col-4">
+                                <a href="{% url 'userprofile' userprofile.user.username %}"><h6>{{courses | length}}</h6></a>
+                                <p>Course</p>
+                            </div>
+                            <div class="col-4">
+                                <a href="{% url 'userfollowers' userprofile.user.username  %}"><h6>{{followed_by | length}}</h6></a>
+                                <p>Followers</p>
+                            </div>
+                            <div class="col-4">
+                                <a href="{% url 'userfollowing' userprofile.user.username  %}"><h6>{{following | length}}</h6></a>
+                                <p>Following</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>

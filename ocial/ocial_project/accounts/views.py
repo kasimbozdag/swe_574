@@ -24,6 +24,8 @@ def signup(request):
 						return render(request, 'accounts/signup.html', {'error': 'E-Mail is used by other user.'})
 					except User.DoesNotExist:
 						user = User.objects.create_user(request.POST['username'], password = request.POST['password'], email = request.POST['email'],first_name = request.POST['firstname'],last_name = request.POST['lastname'])
+						userprofile, created = UserProfile.objects.get_or_create(user=user)
+						userprofile.save()
 						auth.login(request,user)
 						return redirect('home') 
 			else:

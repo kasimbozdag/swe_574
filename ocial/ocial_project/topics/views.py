@@ -27,9 +27,80 @@ def userprofile(request,username):
 	userprofile, created = UserProfile.objects.get_or_create(user=user)
 	userprofile.save()
 	courses = Course.objects.filter(teacher = user,published=True)
-	number_of_courses = len(courses)
 
-	return render(request, 'topics/userprofile.html', {'userprofile': userprofile ,'courses':courses, 'number_of_courses':number_of_courses, 'requester': request.user})
+	followed_by_q = userprofile.user.followed_by.all()
+	following_q = userprofile.user.following.all()
+
+	requester = request.user
+
+	followed_by = list()
+	following = list()
+
+	for followedby_item in followed_by_q:
+		followed_by.append(followedby_item.user)
+
+	for following_item in following_q:
+		following.append(following_item.user)
+
+	return render(request, 'topics/userprofile.html', {'userprofile': userprofile , 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
+
+def userfollowers(request,username):
+	user =  get_object_or_404(User,username=username)
+	userprofile, created = UserProfile.objects.get_or_create(user=user)
+	userprofile.save()
+	courses = Course.objects.filter(teacher = user,published=True)
+
+	followed_by_q = userprofile.user.followed_by.all()
+	following_q = userprofile.user.following.all()
+
+	requester = request.user
+
+	followed_by = list()
+	following = list()
+	followed_by_userprofile = list()
+
+	for followedby_item in followed_by_q:
+		followed_by.append(followedby_item.user)
+
+	for following_item in following_q:
+		following.append(following_item.user)
+
+
+	for userprofile_item in followed_by:
+		userprofile_object = UserProfile.objects.get(user = userprofile_item)
+		followed_by_userprofile.append(userprofile_object)
+
+	return render(request, 'topics/userfollowers.html', {'userprofile': userprofile ,'followed_by_userprofile':followed_by_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
+
+def userfollowing(request,username):
+	user =  get_object_or_404(User,username=username)
+	userprofile, created = UserProfile.objects.get_or_create(user=user)
+	userprofile.save()
+	courses = Course.objects.filter(teacher = user,published=True)
+
+	followed_by_q = userprofile.user.followed_by.all()
+	following_q = userprofile.user.following.all()
+
+	requester = request.user
+
+	followed_by = list()
+	following = list()
+	following_userprofile = list()
+
+	for followedby_item in followed_by_q:
+		followed_by.append(followedby_item.user)
+
+	for following_item in following_q:
+		following.append(following_item.following)
+
+
+	for userprofile_item in following:
+		userprofile_object = UserProfile.objects.get(user = userprofile_item)
+		following_userprofile.append(userprofile_object)
+
+	print(following)
+
+	return render(request, 'topics/userfollowing.html', {'userprofile': userprofile ,'following_userprofile':following_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
 
 
 
@@ -176,18 +247,26 @@ def sectionstatistics(request, section_id):
 
 @login_required
 def editprofile(request):
-	profile_owner = request.user
+	profile_owner = UserProfile.objects.get(user = request.user)
+
 
 	if request.method == 'POST':
+		if request.FILES.get('image', True):
+			profile_owner.image = request.FILES['image']
+			profile_owner.save()
+			print("Osman")
+
+
 		if request.POST['username'] and request.POST['email']:
 			try:
 				user = User.objects.get(username = request.POST['username'])
-				if user == profile_owner:
-					profile_owner.username = request.POST['username']
-					profile_owner.first_name = request.POST['firstname']
-					profile_owner.last_name = request.POST['lastname']
-					profile_owner.email = request.POST['email']
+				if user == profile_owner.user:
+					profile_owner.user.username = request.POST['username']
+					profile_owner.user.first_name = request.POST['firstname']
+					profile_owner.user.last_name = request.POST['lastname']
+					profile_owner.user.email = request.POST['email']
 					profile_owner.save()
+					profile_owner.user.save()
 					return redirect('userprofile', username=profile_owner.username)
 
 				else:
@@ -195,23 +274,25 @@ def editprofile(request):
 			except:
 				try:
 					user = User.objects.get(email = request.POST['email'])
-					if user == profile_owner:
-						profile_owner.username = request.POST['username']
-						profile_owner.first_name = request.POST['firstname']
-						profile_owner.last_name = request.POST['lastname']
-						profile_owner.email = request.POST['email']
+					if user == profile_owner.user:
+						profile_owner.user.username = request.POST['username']
+						profile_owner.user.first_name = request.POST['firstname']
+						profile_owner.user.last_name = request.POST['lastname']
+						profile_owner.user.email = request.POST['email']
+						profile_owner.user.save()
 						profile_owner.save()
-						return redirect('userprofile', username=profile_owner.username)
+						return redirect('userprofile', username=profile_owner.user.username)
 
 					else:
 						return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
 				except:
-						profile_owner.username = request.POST['username']
-						profile_owner.first_name = request.POST['firstname']
-						profile_owner.last_name = request.POST['lastname']
-						profile_owner.email = request.POST['email']
+						profile_owner.user.username = request.POST['username']
+						profile_owner.user.first_name = request.POST['firstname']
+						profile_owner.user.last_name = request.POST['lastname']
+						profile_owner.user.email = request.POST['email']
+						profile_owner.user.save()
 						profile_owner.save()
-						return redirect('userprofile', username=profile_owner.username)
+						return redirect('userprofile', username=profile_owner.user.username)
 
 		else:
 			return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
@@ -1260,4 +1341,21 @@ def pathitemstate(section_id,learner):
 	lir_finished.sort(key=lambda x: x.order, reverse=False)
 
 	return lir, lir_finished
+
+def followuser(request, username):
+	user =  get_object_or_404(User,username=request.user.username)
+	following =  get_object_or_404(User,username=username)
+	userfollowing, created = UserFollowing.objects.get_or_create(user=user, following = following)
+	userfollowing.save()
+	return redirect('userprofile', username=following.username)
+
+
+
+def unfollowuser(request, username):
+	user =  get_object_or_404(User,username=request.user.username)
+	following =  get_object_or_404(User,username=username)
+	userfollowing, created = UserFollowing.objects.get_or_create(user=user, following = following)
+	userfollowing.delete()
+	return redirect('userprofile', username=following.username)
+
 

@@ -4,4 +4,6 @@ from .models import *
 
 admin.site.register(Learner)
 admin.site.register(UserProfile)
+admin.site.register(UserFollowing)
+
 

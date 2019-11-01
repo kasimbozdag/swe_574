@@ -129,10 +129,10 @@
                 </div>
 
                 <div class="col-sm-4">
-                    {% if course.image %}
+                    
                     <button type="submit" name="addglossary" class="btn btn-danger btn-block"><i class="fas fa-plus"></i> Add Glossary</button>
                     <br />
-
+                    {% if course.image %}
                     <img src="{{ course.image.url }}" style="width:100%; height: auto"> 
                     {% endif %}
                     Course Image
