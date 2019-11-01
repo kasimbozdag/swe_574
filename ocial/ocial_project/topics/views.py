@@ -16,6 +16,7 @@ from .decorators import *
 from django.contrib.auth.hashers import check_password
 
 
+
 def home(request):
 	topics = Topic.objects.annotate(number_of_courses=Count('course')) 
 	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
@@ -244,6 +245,18 @@ def sectionstatistics(request, section_id):
 
 	return render(request, 'topics/sectionstatistics.html', {'learningpath':learningpath})
 
+def saveprofile(request,profile_owner):
+	profile_owner.user.username = request.POST['username']
+	profile_owner.user.first_name = request.POST['firstname']
+	profile_owner.user.last_name = request.POST['lastname']
+	profile_owner.user.email = request.POST['email']
+	profile_owner.user.save()
+	osman = request.POST['email']
+	print(osman)
+	if request.FILES.get('image', False):
+		profile_owner.image = request.FILES['image']
+	profile_owner.save()
+
 
 @login_required
 def editprofile(request):
@@ -251,49 +264,18 @@ def editprofile(request):
 
 
 	if request.method == 'POST':
-		if request.FILES.get('image', True):
-			profile_owner.image = request.FILES['image']
-			profile_owner.save()
-			print("Osman")
-
 
 		if request.POST['username'] and request.POST['email']:
-			try:
-				user = User.objects.get(username = request.POST['username'])
-				if user == profile_owner.user:
-					profile_owner.user.username = request.POST['username']
-					profile_owner.user.first_name = request.POST['firstname']
-					profile_owner.user.last_name = request.POST['lastname']
-					profile_owner.user.email = request.POST['email']
-					profile_owner.save()
-					profile_owner.user.save()
-					return redirect('userprofile', username=profile_owner.username)
+			username_check = User.objects.get(username = request.POST['username'])
+			useremail_check = User.objects.get(email = request.POST['email'])
 
-				else:
-					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
-			except:
-				try:
-					user = User.objects.get(email = request.POST['email'])
-					if user == profile_owner.user:
-						profile_owner.user.username = request.POST['username']
-						profile_owner.user.first_name = request.POST['firstname']
-						profile_owner.user.last_name = request.POST['lastname']
-						profile_owner.user.email = request.POST['email']
-						profile_owner.user.save()
-						profile_owner.save()
-						return redirect('userprofile', username=profile_owner.user.username)
-
-					else:
-						return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
-				except:
-						profile_owner.user.username = request.POST['username']
-						profile_owner.user.first_name = request.POST['firstname']
-						profile_owner.user.last_name = request.POST['lastname']
-						profile_owner.user.email = request.POST['email']
-						profile_owner.user.save()
-						profile_owner.save()
-						return redirect('userprofile', username=profile_owner.user.username)
-
+			if username_check != profile_owner.user:
+				return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
+			elif useremail_check != profile_owner.user:
+				return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
+			else:	
+				saveprofile(request,profile_owner)
+				return redirect('userprofile', username=profile_owner.user.username)
 		else:
 			return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
 	else:
