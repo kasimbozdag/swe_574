@@ -246,15 +246,14 @@ def sectionstatistics(request, section_id):
 	return render(request, 'topics/sectionstatistics.html', {'learningpath':learningpath})
 
 def saveprofile(request,profile_owner):
+	print(request.POST)
 	profile_owner.user.username = request.POST['username']
 	profile_owner.user.first_name = request.POST['firstname']
 	profile_owner.user.last_name = request.POST['lastname']
 	profile_owner.user.email = request.POST['email']
 	profile_owner.user.save()
-	osman = request.POST['email']
-	print(osman)
-	if request.FILES.get('image', False):
-		profile_owner.image = request.FILES['image']
+	if request.FILES.get('profile_image', False):
+		profile_owner.image = request.FILES['profile_image']
 	profile_owner.save()
 
 
@@ -266,14 +265,17 @@ def editprofile(request):
 	if request.method == 'POST':
 
 		if request.POST['username'] and request.POST['email']:
-			username_check = User.objects.get(username = request.POST['username'])
-			useremail_check = User.objects.get(email = request.POST['email'])
-
-			if username_check != profile_owner.user:
-				return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
-			elif useremail_check != profile_owner.user:
-				return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
-			else:	
+			try:
+				username_check = User.objects.get(username = request.POST['username'])
+				useremail_check = User.objects.get(email = request.POST['email'])
+				if username_check != profile_owner.user:
+					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
+				elif useremail_check != profile_owner.user:
+					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
+				else:
+					saveprofile(request,profile_owner)
+					return redirect('userprofile', username=profile_owner.user.username)
+			except:	
 				saveprofile(request,profile_owner)
 				return redirect('userprofile', username=profile_owner.user.username)
 		else:
@@ -582,6 +584,7 @@ def editsection(request,section_id):
 
 
 	if request.method == 'POST':
+		print(request.POST)
 		savesection(request,section)
 		if 'save_section' in request.POST:
 			if request.POST['sectionname']:
@@ -1324,6 +1327,7 @@ def pathitemstate(section_id,learner):
 
 	return lir, lir_finished
 
+@login_required
 def followuser(request, username):
 	user =  get_object_or_404(User,username=request.user.username)
 	following =  get_object_or_404(User,username=username)
@@ -1332,7 +1336,7 @@ def followuser(request, username):
 	return redirect('userprofile', username=following.username)
 
 
-
+@login_required
 def unfollowuser(request, username):
 	user =  get_object_or_404(User,username=request.user.username)
 	following =  get_object_or_404(User,username=username)

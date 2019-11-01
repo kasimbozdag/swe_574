@@ -135,8 +135,20 @@
                     {% if course.image %}
                     <img src="{{ course.image.url }}" style="width:100%; height: auto"> 
                     {% endif %}
-                    Course Image
-                    <input type="file" class="form-control-file" name="image">
+                    <br />
+                    <br />
+                    <div class="form-group input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupFileAddon01"></span>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" class="custom-file-input" name="image" id="inputGroupFile01" aria-describedby="inputGroupFileAddon01">
+                            <label class="custom-file-label" for="inputGroupFile01">Course Image</label>
+                        </div>
+                    </div>
+
+
+
                     <br />
                     <label for="exampleFormControlSelect1">Topic</label>
                     <select class="form-control" name="topic">
