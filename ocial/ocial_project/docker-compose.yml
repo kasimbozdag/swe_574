@@ -1,0 +1,28 @@
+version: '3.7'
+
+services:
+  ocial_web:
+    build: .
+    restart: always
+    image: ocial_web
+    command: >
+      bash -c "python /app/manage.py makemigrations && python /app/manage.py migrate && python /app/manage.py runserver 0.0.0.0:8000"
+    #hostname: wops_python
+    ports:
+      - "8002:8000"
+    volumes:
+      - .:/app/
+
+  ocial_db:
+    image: postgres:11
+    restart: always
+    ports:
+      - "54320:5432"
+    environment:
+      POSTGRES_PASSWORD: 1234qwer
+      POSTGRES_USER: postgres
+      POSTGRES_DB: ocialdb
+    volumes:
+      - my_dbdata:/var/lib/postgresql/data
+volumes:
+  my_dbdata:
