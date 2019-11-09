@@ -25,6 +25,7 @@ def home(request):
 
 def userprofile(request,username):
 	user =  get_object_or_404(User,username=username)
+	
 	userprofile, created = UserProfile.objects.get_or_create(user=user)
 	userprofile.save()
 	courses = Course.objects.filter(teacher = user,published=True)
@@ -43,7 +44,14 @@ def userprofile(request,username):
 	for following_item in following_q:
 		following.append(following_item.user)
 
-	return render(request, 'topics/userprofile.html', {'userprofile': userprofile , 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
+
+	try:
+		learner =  Learner.objects.get(user=user)
+		enrolled_courses = Learner_Course_Record.objects.filter(learner = learner)
+	except:
+		enrolled_courses = None
+
+	return render(request, 'topics/userprofile.html', {'userprofile': userprofile , 'enrolled_courses':enrolled_courses,'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
 
 def userfollowers(request,username):
 	user =  get_object_or_404(User,username=username)
