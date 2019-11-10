@@ -1,10 +1,80 @@
 {% extends 'base.html' %} {% block content %}
 
-<table width="80%" align="center">
+<table width="60%" align="center">
   <tr><td align="center">
     &nbsp;
 
-    <table width="70%" align="center" border="2">
+    <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body ">
+                    <h6>{{ userprofile.user.get_full_name }}</h6></a> has created a new course
+                  <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body ">
+                    <h6>{{ userprofile.user.get_full_name }}</h6></a> has finished a course
+                  <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body ">
+                    <h6>{{ userprofile.user.get_full_name }}</h6></a> has created a new course
+                  <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body ">
+                    <h6>{{ userprofile.user.get_full_name }}</h6></a> has created a new course
+                  <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
+        <div class="row no-gutters">
+            <div class="col-md-2">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body ">
+                    <h6>{{ userprofile.user.get_full_name }}</h6></a> has created a new course
+                  <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!--    <table width="70%" align="center" border="2">
       <tr><td align="center">
         <table width="70%" align="center">
       <tr><td>
@@ -27,7 +97,11 @@
     &nbsp;
   </td></tr><tr><td>
 
-  <table width="70%" align="center" border="2">
+<!-- Document Header Starts
+
+
+
+ <table width="70%" align="center" border="2">
     <tr><td align="center">
       <table width="100%" align="center">
         <tr><td>
@@ -36,7 +110,7 @@
         <tr><td>
           <div class="wrapper" style="text-align: center;">
             <br>
-          <!--  <button align="center" onclick="window.location.href = '{% url 'topics' %}';" class="btn btn-danger">Explore More Topics</button> -->
+          <!--  <button align="center" onclick="window.location.href = '{% url 'topics' %}';" class="btn btn-danger">Explore More Topics</button>
           </div>
         </td></tr>
       </table>
@@ -90,6 +164,7 @@
     <img width="200" height="200" src="https://image.shutterstock.com/image-photo/bright-spring-view-cameo-island-260nw-1048185397.jpg">
   </td></tr>
 </table>
+-->
 
 
 </td></tr>
