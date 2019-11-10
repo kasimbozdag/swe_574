@@ -11,6 +11,7 @@ urlpatterns = [
 	path('accounts/', include('accounts.urls')),
     path('classroom/', include('topics.urls')),
     path('topics',views.topics, name= 'topics'),
+    path('news/',views.news, name='news'),
     path('<username>/', views.userprofile, name='userprofile'),
     path('<username>/followers', views.userfollowers, name='userfollowers'),
     path('<username>/following', views.userfollowing, name='userfollowing'),
@@ -24,5 +25,5 @@ urlpatterns = [
     path('explorelabel/<int:label_id>',views.explorelabel, name= 'explorelabel'),
     path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
     path('enroll/<int:course_id>', views.enrollcourse , name='enrollcourse'),
-    
+
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
