@@ -1,3 +1,4 @@
+from django.conf.urls import url
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
@@ -24,5 +25,5 @@ urlpatterns = [
     path('explorelabel/<int:label_id>',views.explorelabel, name= 'explorelabel'),
     path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
     path('enroll/<int:course_id>', views.enrollcourse , name='enrollcourse'),
-    
+    url('recommendation/', include('recommendation.urls')),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
