@@ -60,3 +60,43 @@ The project should be running now
 
 More detailed guide: https://github.com/onurasiliskender/ocial/wiki/07.-System-Deployment-Guide
 
+### Docker
+Open the project(ocial/ocial_project) at your favorite Python IDE
+
+Add (create new file) local_settings.py file in the ocial directory
+
+Add SECRET_KEY to the local_settings.py
+
+Add database settings to local_settings.py
+
+Example code for local_settings.py
+
+```
+SECRET_KEY = 'rk?(5*xs(fh1z3d9qd+b=lx?(&mjbxmf_f1va%nbqa7b#d#(j7'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ocialdb',
+        'USER': '******',
+        'PASSWORD': '******',
+        'HOST':'ocial_db',
+        'PORT':'5432'
+
+    }
+}
+```
+
+Note that 'NAME', 'USER', 'PASSWORD' should be same as in docker-compose file
+```
+environment:
+      POSTGRES_PASSWORD: ******
+      POSTGRES_USER: ******
+      POSTGRES_DB: ocialdb
+```
+Than run the following comamand in the terminal
+```
+docker-compose up
+```
+
+Now you access to the site from 127.0.0.1:8002
