@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+    {% load staticfiles %}
+
+
+
+
+
+
+
+
+
+    <div class="container" style="margin-top:20px;">
+        <div class="text-center">
+            <h2>Recommendation List</h2>
+        </div>
+        <div class="album py-5 bg-light">
+            <div class="container">
+
+                <div class="row">
+
+                    {% for course in courses %}
+
+                        <div class="col-md-4">
+                            <div style="height: 450px;" class="card mb-4">
+                                <img style="object-fit: cover; height: 200px;" class="card-img-top rounded-0" style="" src="{{ course.image.url }}"/>
+                                <div class="card-body">
+                                    <a href="{% url 'coursedetail' course.id %}"><h6 class="card-text">{{ course.title }}</h6></a>
+                                    <p class="card-text">{{ course.summary }}</p>
+                                </div>
+
+                                <div class="card-footer">
+                                    <small class="text-muted"><a href="{% url 'exploretopic' course.topic.id %}">{{ course.topic }}</a></small>
+                                    <br/>
+                                    <small class="text-muted">{{ course.pub_date }}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+            </div>
+        </div>
+
+{% endblock %}
