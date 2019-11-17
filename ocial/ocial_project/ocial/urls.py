@@ -12,6 +12,7 @@ urlpatterns = [
 	path('accounts/', include('accounts.urls')),
     path('classroom/', include('topics.urls')),
     path('topics',views.topics, name= 'topics'),
+    path('news',views.news, name= 'news'),
     path('<username>/', views.userprofile, name='userprofile'),
     path('<username>/followers', views.userfollowers, name='userfollowers'),
     path('<username>/following', views.userfollowing, name='userfollowing'),
