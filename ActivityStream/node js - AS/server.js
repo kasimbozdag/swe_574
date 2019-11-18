@@ -13,8 +13,13 @@ var serverResponse = {};
 var JsonBody = "Response";
 var data = {
   responseCode : "0",
-  responseDescription : "Activity has been created successfully",
-  type : "Follow"
+  responseDescription : "Activity has been created successfully"
+  // type : "Follow"
+};
+var error = {
+  responseCode : "1",
+  responseDescription : "Error! please check the correct format of Activity Stream."
+  // type : "Follow"
 };
 serverResponse[JsonBody] = [];
 serverResponse[JsonBody].push(data);
@@ -49,10 +54,31 @@ const server = http.createServer((request, response) => {
     request.on('data', (chunk) => {
       body.push(chunk);
     }).on('end', () => {
-      body = Buffer.concat(body).toString();
-     var res = JSON.stringify(data);
+    //  body = Buffer.concat(body).toString();
+     var res = JSON.stringify(body);
+  //   var res = JSON.stringify(data);
+     var jsonObj = JSON.parse(body);
+     console.log(jsonObj);
+     if(jsonObj.hasOwnProperty('summary') && jsonObj.hasOwnProperty('actor') && jsonObj.hasOwnProperty('type') && jsonObj.hasOwnProperty('object') && jsonObj.hasOwnProperty('published')){
+     console.log("=================true");
+     console.log("summary:"+jsonObj.summary);
+     console.log("actor:"+jsonObj.actor);
+     console.log("type:"+jsonObj.type);
+     console.log("object:"+jsonObj.object);
+     console.log("published:"+jsonObj.published);
+     var rerturnedResponse = JSON.stringify(data);
+     response.end(rerturnedResponse);
+     }else{// not a stream activity
+     var rerturnedResponse = JSON.stringify(error);
 
-      response.end(res);
+     response.end(rerturnedResponse);
+
+     }
+
+
+
+
+     
     });
   }else if (request.method === 'GET' && request.url === '/getAllActivities'){
 

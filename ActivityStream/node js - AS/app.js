@@ -39,16 +39,16 @@ var app = express();
 //   "published": "2019-11-11T06:14:46Z"
 // }]);
 
-  ref.push({
-  "@context": "https://www.w3.org/ns/activitystreams",
-  "type": "Object",
-  "contentMap": {
-    "en": "test",
-    "fr": "as"
-  },
-  "name": "mdo",
-  "published": "2019-11-11T06:14:46Z"
-});
+//   ref.push({
+//   "@context": "https://www.w3.org/ns/activitystreams",
+//   "type": "Object",
+//   "contentMap": {
+//     "en": "test",
+//     "fr": "as"
+//   },
+//   "name": "mdo",
+//   "published": "2019-11-11T06:14:46Z"
+// });
 var reference = db.ref('activity-85126');
 // getting firebase stored data
 ref.once("value", function(snapshot) {
@@ -130,6 +130,7 @@ ref.on("child_added", function(snapshot, prevChildKey) {
   console.log("firebase database");
   console.log("-----------------------------------------------");
   var newActivity = snapshot.val();
+ // console.log("newActivity" + newActivity.val());
   console.log("context: " + newActivity.context);
   console.log("type: " + newActivity.type);
   console.log("Previous Post ID: " + prevChildKey);
