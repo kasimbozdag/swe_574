@@ -1,3 +1,4 @@
+//MARK: This files Contains the backend code that is responsible for both GET and POST http requests
 var firebase = require("firebase");
 const http = require('http');
 //const databaseF = require('./app.js');
@@ -8,11 +9,12 @@ const port = 3000;
 var express = require("express");
 var app = express();
 var serverResponse = {};
+
 var JsonBody = "Response";
 var data = {
-	responseCode : "0",
-	responseDescription : "Activity has been created successfully",
-	type : "Follow"
+  responseCode : "0",
+  responseDescription : "Activity has been created successfully",
+  type : "Follow"
 };
 serverResponse[JsonBody] = [];
 serverResponse[JsonBody].push(data);
@@ -39,10 +41,10 @@ var reference = db.ref('activity-85126');
 
 
 const server = http.createServer((request, response) => {
-	console.log("The server is running...");
-	//console.log(name);
+  console.log("The server is running...");
+  //console.log(name);
   if (request.method === 'POST' && request.url === '/echo') {
-  	console.log("Received a post Request!");
+    console.log("Received a post Request!");
     let body = [];
     request.on('data', (chunk) => {
       body.push(chunk);
@@ -55,7 +57,7 @@ const server = http.createServer((request, response) => {
   }else if (request.method === 'GET' && request.url === '/getAllActivities'){
 
   console.log("Received a get request");
-  	var res = JSON.stringify(data);
+    var res = JSON.stringify(data);
         response.end(res);
 //   ref.once("value", function(snapshot) {
 //   console.log("ref.once ");
@@ -81,14 +83,14 @@ const server = http.createServer((request, response) => {
 //    const {header, method, url} = req;
 //    let body = [];
 //    req.on('error,' (err)=>{
-//    	console.error(err);
+//      console.error(err);
 
 //    }).on('data',(chunk)=>{
 
-//    	body.push(chunk);
+//      body.push(chunk);
 
 //    }).on('end',()=>{
-//    	body = buffer.concat(body).toString();
+//      body = buffer.concat(body).toString();
 //    });
 
 //     req.statusCode = 200;
