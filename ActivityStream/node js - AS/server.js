@@ -67,6 +67,8 @@ const server = http.createServer((request, response) => {
      console.log("object:"+jsonObj.object);
      console.log("published:"+jsonObj.published);
      var rerturnedResponse = JSON.stringify(data);
+
+     ref.push(jsonObj);
      response.end(rerturnedResponse);
      }else{// not a stream activity
      var rerturnedResponse = JSON.stringify(error);
@@ -83,15 +85,15 @@ const server = http.createServer((request, response) => {
   }else if (request.method === 'GET' && request.url === '/getAllActivities'){
 
   console.log("Received a get request");
-    var res = JSON.stringify(data);
-        response.end(res);
-//   ref.once("value", function(snapshot) {
-//   console.log("ref.once ");
-//   var data = snapshot.val();   //Data is in JSON format.
-//   var res = JSON.stringify(data);
-//   response.end(res);
+    // var res = JSON.stringify(data);
+    //     response.end(res);
+  ref.once("value", function(snapshot) {
+  console.log("ref.once ");
+  var data = snapshot.val();   //Data is in JSON format.
+  var res = JSON.stringify(data);
+  response.end(res);
 
-// });
+});
 
 
   } else {
