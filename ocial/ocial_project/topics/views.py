@@ -14,6 +14,7 @@ from django.core.files import File
 from django.core.files.base import ContentFile
 from .decorators import *
 from django.contrib.auth.hashers import check_password
+from django.core import serializers
 
 
 
@@ -25,7 +26,7 @@ def home(request):
 
 def userprofile(request,username):
 	user =  get_object_or_404(User,username=username)
-	
+
 	userprofile, created = UserProfile.objects.get_or_create(user=user)
 	userprofile.save()
 	courses = Course.objects.filter(teacher = user,published=True)
@@ -1359,4 +1360,20 @@ def news(request):
 	following = list()
 	for following_item in following_q:
 		following.append(following_item.user)
-	return render(request, 'topics/news.html', {'following': following,'userprofile': userprofile})
+
+	json_datas = list()
+	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
+	json_datas.append(json_data)
+	valid_jsons = list()
+
+	for json_data_ in json_datas:
+		data = json.loads(json_data_)
+		test = ActivityStream_JSON()
+		isValid = test.check_validity(data)
+		if isValid:
+			valid_jsons.append(test.get_object())
+
+
+
+
+	return render(request, 'topics/news.html', {'following': following,'userprofile': userprofile,'activity_objects': valid_jsons })
