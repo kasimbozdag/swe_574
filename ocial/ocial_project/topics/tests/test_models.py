@@ -113,7 +113,7 @@ class GlossaryTestCase(TestCase):
 		r_json = wiki_request.json()['search']
 		r_json = json.dumps(r_json)
 		r_json = json.loads(r_json)
-		
+
 		for entity in r_json:
 			self.name = entity['label']
 			self.description = entity['description']
@@ -125,17 +125,15 @@ class GlossaryTestCase(TestCase):
 
 		glossary = Glossary.objects.get(name="Douglas Adams")
 		self.assertEqual(glossary.name, 'Douglas Adams')
-		
+
 
 	def test_glossary_description(self):
 
 		glossary = Glossary.objects.get(name="Douglas Adams")
-		self.assertEqual(glossary.description, 'British author and humorist')
+		self.assertEqual(glossary.description, 'English writer and humorist')
 
 
 	def test_glossary_url(self):
 
 		glossary = Glossary.objects.get(name="Douglas Adams")
 		self.assertEqual(glossary.url, 'https://www.wikidata.org/wiki/Q42')
-		
-

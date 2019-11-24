@@ -182,3 +182,31 @@ class Resource(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class ActivityStream_JSON(models.Model):
+	context = models.CharField(max_length=200, blank=True)
+	summary = models.CharField(max_length=200, blank=True)
+	type = models.CharField(max_length=200, blank=True)
+	actor = models.CharField(max_length=200, blank=True)
+	object = models.CharField(max_length=200, blank=True)
+	published = models.CharField(max_length=200, blank=True)
+	keysArray = ['@context', 'summary', 'type', 'actor', 'object', 'published']
+
+
+
+	def check_validity(self,json_data):
+
+		for key in self.keysArray:
+			if not key in json_data:
+				return False
+
+		self.summary = json_data['summary']
+		self.type = json_data['type']
+		self.actor = json_data['actor']
+		self.object =  json_data['object']
+		self.published =  json_data['published']
+
+		return True
+
+	def get_object(self):
+		return self

@@ -70,5 +70,29 @@ class ViewTestCase(TestCase):
 
 		self.assertEqual(learningpath, comparelist)
 
+	def test_news(self):
+			user_test2 = User.objects.create_user(
+	   			username = 'test__user',
+	    		password = 'testtest',
+	    		email = 'test@test.com'
+	    	)
+			user_test = User.objects.create_user(
+	   			username = 'test___user',
+	    		password = 'testtest',
+	    		email = 'test@test.com'
+	    	)
+
+			getted,created= UserProfile.objects.get_or_create(user=user_test2)
+			userprofile= UserProfile.objects.get(user=user_test2)
 
 
+			following =  get_object_or_404(User,username='test___user')
+
+			userfollowing, created = UserFollowing.objects.get_or_create(user=user_test2, following = following)
+			mylist = [(userfollowing)]
+			userprofile.user.following.set(mylist)
+			following_q = userprofile.user.following.all()
+			following = list()
+			for following_item in following_q:
+				following.append(following_item.user)
+				self.assertEqual(user_test2, following_item.user)
