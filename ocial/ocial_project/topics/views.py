@@ -1363,7 +1363,9 @@ def news(request):
 
 	json_datas = list()
 	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
+	json_data2 = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Added a new learning path to topic Impeachment", "type": "create", "actor": "Emre Yapar", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
 	json_datas.append(json_data)
+	json_datas.append(json_data2)
 	valid_jsons = list()
 
 	for json_data_ in json_datas:
