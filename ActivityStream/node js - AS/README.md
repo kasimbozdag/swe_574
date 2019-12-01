@@ -21,9 +21,7 @@ node -v
 
 once your server is running type http://127.0.0.1:3000/getAllActivities for http address, and for http method select a get then click send
 
-Add SECRET_KEY to the local_settings.py
 
-Add database settings to local_settings.py
 
 Example code for JSON ld for get request
 
