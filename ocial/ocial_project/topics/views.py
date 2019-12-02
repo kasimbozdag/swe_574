@@ -19,7 +19,7 @@ from django.core import serializers
 
 
 def home(request):
-	topics = Topic.objects.annotate(number_of_courses=Count('course'))
+	topics = Topic.objects.filter(course__published=True).annotate(number_of_courses=Count('course'))
 	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
 	topics = topics[:9]
 	return render(request, 'topics/home.html', {'topics': topics })
