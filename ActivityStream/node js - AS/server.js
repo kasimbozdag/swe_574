@@ -5,7 +5,7 @@ const url = require('url');
 //const databaseF = require('./app.js');
 //var name = databaseF.fileName; 
 
-const hostname = '127.0.0.1';
+const hostname = '0.0.0.0';
 const port = 3000;
 var express = require("express");
 var app = express();
