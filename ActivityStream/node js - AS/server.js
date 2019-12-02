@@ -132,21 +132,24 @@ const server = http.createServer((request, response) => {
 
      //ref.push(jsonObj);
      response.end(res);
-      console.log("json: "+res)
+     console.log("json: "+res)
 
 });
 
     }else{
       // wrong get request
+    response.statusCode = 404;
+    response.end();
+
     }
   //  var res = JSON.stringify(request.headers);
    // console.log(res);
     console.log("============= request headers");
    // console.log(request.headers);
     console.log("=============");
-    response.writeHead( 200 );
-    response.write( JSON.stringify( url_parts.query ) );
-    response.end();
+ //   response.writeHead( 200 );
+  //  response.write( JSON.stringify( url_parts.query ) );
+  //  response.end();
     //console.log("HEADERS: ${JSON.stringify(request.headers)}");
 
   } else {
