@@ -1,6 +1,7 @@
 //MARK: This files Contains the backend code that is responsible for both GET and POST http requests
 var firebase = require("firebase");
 const http = require('http');
+const url = require('url');
 //const databaseF = require('./app.js');
 //var name = databaseF.fileName; 
 
@@ -21,6 +22,11 @@ var error = {
   responseDescription : "Error! please check the correct format of Activity Stream."
   // type : "Follow"
 };
+var errorWrongEntry = {
+  responseCode : "1",
+  responseDescription : "Error! wrong entry please check the data that to be queryed "
+  // type : "Follow"
+};
 serverResponse[JsonBody] = [];
 serverResponse[JsonBody].push(data);
 
@@ -32,7 +38,7 @@ var firebaseConfig = {
     projectId: "activity-85126",
     storageBucket: "activity-85126.appspot.com",
     messagingSenderId: "739852772274",
-    appId: "1:739852772274:web:85f7342f6a4d4eb701faab"
+    appId: "1:739852772274:web:85f7342f6a4d4eb701faab",
   };
 //   // Initialize Firebase
  var defaultProject = firebase.initializeApp(firebaseConfig);
@@ -95,6 +101,53 @@ const server = http.createServer((request, response) => {
 
 });
 
+
+  }else if (request.method === "GET" ){
+    //  && request.url === '/getActorActivity' 
+    console.log("Received a get request for getActorActivity");
+    var url_parts = url.parse(request.url,true);
+    console.log(url_parts.query);
+    var jsonObj = JSON.stringify( url_parts.query );
+
+    console.log("jsonObj"+jsonObj);
+    var body = [];
+    body.push(jsonObj);
+    console.log("body"+body);
+    var val = JSON.parse(body);
+    console.log("val"+val);
+
+
+    if (val.hasOwnProperty('actor')){
+      console.log("============= has an actor");
+      console.log("the actor is: "+val.actor);
+
+
+      ref.orderByChild("actor").equalTo(val.actor).on("value", function(snapshot) {
+
+      console.log(snapshot.key);
+      var data = snapshot.val();   //Data is in JSON format.
+      var res = JSON.stringify(data);
+      //
+    //  var rerturnedResponse = JSON.stringify(data);
+
+     //ref.push(jsonObj);
+     response.end(res);
+      console.log("json: "+res)
+
+});
+
+    }else{
+      // wrong get request
+    }
+  //  var res = JSON.stringify(request.headers);
+   // console.log(res);
+    console.log("============= request headers");
+   // console.log(request.headers);
+    console.log("=============");
+    response.writeHead( 200 );
+    response.write( JSON.stringify( url_parts.query ) );
+    response.end();
+    //console.log("HEADERS: ${JSON.stringify(request.headers)}");
 
   } else {
     response.statusCode = 404;
