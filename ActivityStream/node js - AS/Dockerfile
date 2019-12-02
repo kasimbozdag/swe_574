@@ -14,6 +14,6 @@ RUN npm install
 
 # Bundle app source
 COPY . .
-
+RUN npm rebuild
 EXPOSE 3000
 CMD [ "node", "server.js" ]
