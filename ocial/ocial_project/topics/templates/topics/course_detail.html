@@ -29,7 +29,7 @@
                     <li class="list-group-item">
                         <a href="{%url 'exploretopic' course.topic.id %}">{{ course.topic.title }}</a>
                     </li>
-                    <li class="list-group-item">Teacher: <a href="{% url 'userprofile' course.teacher.username %}">{{ course.teacher.username }}</a></li>
+                    <li class="list-group-item">By: <a href="{% url 'userprofile' course.teacher.username %}">{{ course.teacher.username }}</a></li>
                 </ul>
                 <div class="card-body">
                     {% for label in course.label.all %}

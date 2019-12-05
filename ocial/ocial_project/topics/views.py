@@ -15,6 +15,16 @@ from django.core.files.base import ContentFile
 from .decorators import *
 from django.contrib.auth.hashers import check_password
 from django.core import serializers
+import urllib.request 
+import ssl
+from functools import reduce
+from django.db.models import Q
+from operator import or_
+
+
+
+
+
 
 
 
@@ -108,7 +118,7 @@ def userfollowing(request,username):
 		userprofile_object = UserProfile.objects.get(user = userprofile_item)
 		following_userprofile.append(userprofile_object)
 
-	print(following)
+	
 
 	return render(request, 'topics/userfollowing.html', {'userprofile': userprofile ,'following_userprofile':following_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
 
@@ -118,8 +128,36 @@ def topics(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_topic', None)
 
+		ssl._create_default_https_context = ssl._create_unverified_context
+
+		search_list = list()
+		search_list.append(search_query)
+
+
 		if search_query != None:
-			topics = Topic.objects.filter(title__icontains=search_query).annotate(number_of_courses=Count('course'))
+
+			url = "https://api.datamuse.com/words?ml=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sl=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+
+		if search_query != None:
+			query = Q()
+			for item in search_list:
+				query |= Q(title__icontains=item)
+			topics = Topic.objects.filter(query).annotate(number_of_courses=Count('course'))
 		else:
 			topics = Topic.objects.annotate(number_of_courses=Count('course'))
 			topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
@@ -130,8 +168,40 @@ def explore(request):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
 
+		ssl._create_default_https_context = ssl._create_unverified_context
+
+		search_list = list()
+		search_list.append(search_query)
+
+
 		if search_query != None:
-			courses = Course.objects.filter(title__icontains=search_query, published=True)
+
+			url = "https://api.datamuse.com/words?ml=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sl=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+
+		if search_query != None:
+			query = Q()
+			for item in search_list:
+				query |= Q(title__icontains=item)
+				query |= Q(topic__title__icontains=item)
+				query |= Q(description__icontains=item)
+				query |= Q(wywl__icontains=item)
+
+			courses = Course.objects.filter(query, published=True)
 		else:
 			courses = Course.objects.filter(published=True)
 			#courses = sorted(courses,reverse=True)
@@ -143,8 +213,40 @@ def exploretopic(request,topic_id):
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_course', None)
 
+		ssl._create_default_https_context = ssl._create_unverified_context
+
+		search_list = list()
+		search_list.append(search_query)
+
+
 		if search_query != None:
-			courses = Course.objects.filter(topic= topic_id,title__icontains=search_query, published=True)
+
+			url = "https://api.datamuse.com/words?ml=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sl=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+
+		if search_query != None:
+			query = Q()
+			for item in search_list:
+				query |= Q(title__icontains=item)
+				query |= Q(topic__title__icontains=item)
+				query |= Q(description__icontains=item)
+				query |= Q(wywl__icontains=item)
+
+			courses = Course.objects.filter(query,topic= topic_id, published=True)
 		else:
 			courses = Course.objects.filter(topic= topic_id,published=True)
 			#courses = sorted(courses,reverse=True)
@@ -156,9 +258,38 @@ def explorelabel(request,label_id):
 
 	if request.method == 'GET': # If the form is submitted
 		search_query = request.GET.get('search_label', None)
+		ssl._create_default_https_context = ssl._create_unverified_context
+
+		search_list = list()
+		search_list.append(search_query)
+
 
 		if search_query != None:
-			courses = Course.objects.filter(label= label_id,title__icontains=search_query, published=True)
+
+			url = "https://api.datamuse.com/words?ml=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sl=" + search_query
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+				
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+		if search_query != None:
+			query = Q()
+			for item in search_list:
+				query |= Q(title__icontains=item)
+				query |= Q(topic__title__icontains=item)
+				query |= Q(description__icontains=item)
+				query |= Q(wywl__icontains=item)
+			courses = Course.objects.filter(query,label= label_id, published=True)
 		else:
 			courses = Course.objects.filter(label= label_id,published=True)
 			#courses = sorted(courses,reverse=True)
