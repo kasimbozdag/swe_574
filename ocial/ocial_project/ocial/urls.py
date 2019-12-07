@@ -23,7 +23,6 @@ urlpatterns = [
     path('explore',views.explore, name= 'explore'),
     path('exploretopic/<int:topic_id>',views.exploretopic, name= 'exploretopic'),
     path('exploreteacher/<id>',views.exploreteacher, name= 'exploreteacher'),
-    path('explorelabel/<int:label_id>',views.explorelabel, name= 'explorelabel'),
     path('course/<int:course_id>/', views.coursedetail, name = 'coursedetail'),
     path('enroll/<int:course_id>', views.enrollcourse , name='enrollcourse'),
     url('recommendation/', include('recommendation.urls')),
