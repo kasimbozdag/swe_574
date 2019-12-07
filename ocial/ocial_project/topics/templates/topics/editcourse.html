@@ -58,7 +58,16 @@
 
             <div class="row">
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}"> {% if course.id %}
+
+                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}"> 
+                    <br/>
+
+                    {%if course.isPublishable == False%}
+                    <small>Notice: In order to publish this course it must have at least one section and all sections must have green check(submitted) marks.</small> 
+                    {%endif%}
+
+
+                    {% if course.id %}
                     <input type="hidden" name="section-order" id="section-order">
 
                     <ul class="list-group mt-4" id="demo2">
@@ -74,7 +83,7 @@
                                     <div class="modal-body">
                                         <form>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name">
+                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name (Required)">
                                             </div>
                                         </form>
                                     </div>
@@ -152,7 +161,7 @@
                     <br />
                     <label for="exampleFormControlSelect1">Topic</label>
                     <select class="form-control" name="topic">
-                        <option disabled selected>Select topic</option>
+                        <option disabled selected>Select Topic (Required)</option>
                         {% for topic in topics.all %} 
                         {% if topic.id == course.topic.id %}
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
@@ -170,15 +179,7 @@
                             </div>
                         </div>
 
-                    <br /> 
-                    {% for label in course.label.all %}
-                    <button type="button" onclick="window.location.href='{% url 'deletelabel' course.id label.id %}';" class="badge badge-pill badge-dark" style="margin-bottom: 5px;"><i class="fa fa-close"></i> {{ label.name }}</button>
-
-                    {% endfor %}
-
-                    <input type="text" class="form-control" name="labels" placeholder="Labels">
-
-                    <br /> {% if course.id %} {% if course.published == True %}
+                    {% if course.id %} {% if course.published == True %}
                     <small>Published at: {{course.pub_date_exact}} <a href="{% url 'coursedetail' course.id %}" target="_blank">View Course</a></small> 
                     {% else %}
                     <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
