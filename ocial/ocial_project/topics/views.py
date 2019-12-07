@@ -575,8 +575,7 @@ def savecourse(request,course):
 	if request.FILES.get('image', False):
 		course.image = request.FILES['image']
 
-	labels = request.POST['labels']
-	labels = labels.split(",")
+
 
 	if course.section_set.all():
 		for section in course.section_set.all():
@@ -588,11 +587,6 @@ def savecourse(request,course):
 				break
 
 	course.save()
-
-	if request.POST['labels']:
-		for label in labels:
-			newlabel , created = Label.objects.get_or_create(name = label)
-			course.label.add(newlabel)
 
 @login_required
 @course_teacher_is_user
@@ -987,7 +981,14 @@ def editquestion(request, question_id):
 	question =  get_object_or_404(Question,pk=question_id)
 	teacher = question.quiz.section.course.teacher
 
-	if question.choice_set.all():
+	answer_selected = False
+
+	for choice in question.choice_set.all():
+		if choice.isTrue:
+			answer_selected = True
+
+
+	if question.choice_set.all() and answer_selected:
 		question.isPublishable = True
 	else:
 		question.isPublishable = False
@@ -1050,7 +1051,14 @@ def savequestion(request,question):
 
 	question.title = request.POST['questiontitle']
 
-	if question.choice_set.all():
+	answer_selected = False
+
+	for choice in question.choice_set.all():
+		if choice.isTrue:
+			answer_selected = True
+
+
+	if question.choice_set.all() and answer_selected:
 		question.isPublishable = True
 	else:
 		question.isPublishable = False

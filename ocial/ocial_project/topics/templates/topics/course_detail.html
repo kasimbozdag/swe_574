@@ -31,10 +31,7 @@
                     </li>
                     <li class="list-group-item">By: <a href="{% url 'userprofile' course.teacher.username %}">{{ course.teacher.username }}</a></li>
                 </ul>
-                <div class="card-body">
-                    {% for label in course.label.all %}
-                    <a href="{% url 'explorelabel' label.id %}" class="badge badge-pill badge-danger" style="margin-bottom: 5px;">{{ label.name }}</a> {% endfor %}
-                </div>
+
 
             </div>
         </div>

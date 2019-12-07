@@ -19,7 +19,7 @@
 
             <div class="row">
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="title" placeholder="Title" value="{{ course.title }}"> {% if course.id %}
+                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}" required=""> {% if course.id %}
                     <ul class="list-group mt-4" id="demo2">
                         <div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -33,7 +33,7 @@
                                     <div class="modal-body">
                                         <form>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name">
+                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name (Required)">
                                             </div>
                                         </form>
                                     </div>
@@ -79,8 +79,8 @@
                     <input type="file" class="form-control-file" name="image">
                     <br />
                     <label for="exampleFormControlSelect1">Topic</label>
-                    <select class="form-control" name="topic">
-                        <option disabled selected>Select topic</option>
+                    <select class="form-control" name="topic" required>
+                        <option disabled selected value="">Select Topic (Required)</option>
                         {% for topic in topics.all %} {% if topic.id == course.topic.id %}
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
                         {% else %}
@@ -95,15 +95,7 @@
                                 <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
                             </div>
                         </div>
-
-                    <br /> 
-                    {% for label in course.label.all %}
-                    <button type="submit" name="removelabel" class="badge badge-pill badge-dark" style="margin-bottom: 5px;">{{ label.name }}</button>
-                    <input type="hidden" name="labelremove" value="{{ label.id }}"> {% endfor %}
-
-                    <input type="text" class="form-control" name="labels" placeholder="Labels">
-
-                    <br /> {% if course.id %} {% if course.published == True %}
+                    {% if course.id %} {% if course.published == True %}
                     <small>Published at: {{course.pub_date_exact}}</small> {% else %}
                     <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
 

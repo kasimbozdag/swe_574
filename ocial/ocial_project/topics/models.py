@@ -19,7 +19,6 @@ class Course(models.Model):
 	wywl = models.TextField(blank=True)
 	teacher = models.ForeignKey(User, on_delete=models.CASCADE)
 	topic = models.ForeignKey('Topic', on_delete=models.CASCADE)
-	label = models.ManyToManyField('Label', blank=True)
 	published = models.BooleanField(default=False)
 	course_learner = models.ManyToManyField(Learner, blank=True,through='Learner_Course_Record')
 	isPublishable = models.BooleanField(default=False)
@@ -40,13 +39,6 @@ class Course(models.Model):
 
 	def summary(self):
 		return self.description[:200]
-
-
-class Label(models.Model):
-	name = models.CharField(max_length=50, unique=True)
-
-	def __str__(self):
-		return self.name
 
 class Learner_Course_Record(models.Model):
     learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
