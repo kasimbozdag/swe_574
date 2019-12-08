@@ -64,7 +64,11 @@
                     {% if quiz.id %}                    
                     <small>{{quiz.section.course}} / {{quiz.section}}</small>
                     {% endif %}
-                    <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title" value="{{ quiz.title }}">
+                    <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title (Required)" value="{{ quiz.title }}">
+
+                    {%if quiz.isPublishable == False%}
+                    <small>Notice: In order to submit this quiz it must have at least one question and all questions must have green check(submitted) marks.</small> 
+                    {%endif%}
 
                     <input type="hidden" name="question-order" id="question-order">
 
@@ -81,7 +85,7 @@
                                     <div class="modal-body">
                                         <form>
                                             <div class="form-group">
-                                                <textarea type="text" class="form-control" name="questiontitle" placeholder="Question" rows=4></textarea>
+                                                <textarea type="text" class="form-control" name="questiontitle" placeholder="Question (Required)" rows=4></textarea>
                                             </div>
                                         </form>
                                     </div>
