@@ -19,7 +19,7 @@
 
             <div class="row">
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}" required=""> {% if course.id %}
+                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}"> {% if course.id %}
                     <ul class="list-group mt-4" id="demo2">
                         <div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
                             <div class="modal-dialog" role="document">
@@ -79,7 +79,7 @@
                     <input type="file" class="form-control-file" name="image">
                     <br />
                     <label for="exampleFormControlSelect1">Topic</label>
-                    <select class="form-control" name="topic" required>
+                    <select class="form-control" name="topic">
                         <option disabled selected value="">Select Topic (Required)</option>
                         {% for topic in topics.all %} {% if topic.id == course.topic.id %}
                         <option selected value="{{ topic.id }}">{{ topic }}</option>
