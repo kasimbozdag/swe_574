@@ -64,7 +64,11 @@
                     {% if question.id %}
                     <small>{{question.quiz.section.course}} / {{question.quiz.section}} / {{question.quiz}}</small>
                     {% endif %}
-                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Quiz Title" rows=4>{{ question.title }}</textarea>
+                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Question (Required)" rows=4>{{ question.title }}</textarea>
+
+                    {%if question.isPublishable == False%}
+                    <small>Notice: In order to submit this question it must have at least one answer and one of the answers must be selected as Correct.</small> 
+                    {%endif%}
 
                     <input type="hidden" name="choice-order" id="choice-order">
 
@@ -82,7 +86,7 @@
                                     <div class="modal-body">
                                         <form>
                                             <div class="form-group">
-                                                <textarea type="text" class="form-control" name="choicetitle" placeholder="Answer" rows=4></textarea>
+                                                <textarea type="text" class="form-control" name="choicetitle" placeholder="Answer (Required)" rows=4></textarea>
                                             </div>
                                         </form>
                                     </div>
