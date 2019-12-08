@@ -26,8 +26,10 @@ services:
       - my_dbdata:/var/lib/postgresql/data
 
   activity_stream:
+    restart: always
     build: ../../ActivityStream/node js - AS/
     image: activity_stream
+    command: bash -c "npm install && npm rebuild && node server.js"
     ports:
       - "3000:3000"
     volumes:
