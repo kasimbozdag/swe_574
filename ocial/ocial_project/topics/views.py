@@ -22,12 +22,6 @@ from django.db.models import Q
 from operator import or_
 
 
-
-
-
-
-
-
 def home(request):
 	topics = Topic.objects.filter(course__published=True).annotate(number_of_courses=Count('course'))
 	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
@@ -136,7 +130,7 @@ def topics(request):
 
 		if search_query != None:
 
-			url = "https://api.datamuse.com/words?ml=" + search_query
+			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -144,7 +138,7 @@ def topics(request):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query
+			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -176,7 +170,7 @@ def explore(request):
 
 		if search_query != None:
 
-			url = "https://api.datamuse.com/words?ml=" + search_query
+			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -184,7 +178,7 @@ def explore(request):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query
+			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -221,7 +215,7 @@ def exploretopic(request,topic_id):
 
 		if search_query != None:
 
-			url = "https://api.datamuse.com/words?ml=" + search_query
+			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -229,7 +223,7 @@ def exploretopic(request,topic_id):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query
+			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -266,7 +260,7 @@ def explorelabel(request,label_id):
 
 		if search_query != None:
 
-			url = "https://api.datamuse.com/words?ml=" + search_query
+			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -274,7 +268,7 @@ def explorelabel(request,label_id):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query
+			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
