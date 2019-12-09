@@ -15,7 +15,7 @@ from django.core.files.base import ContentFile
 from .decorators import *
 from django.contrib.auth.hashers import check_password
 from django.core import serializers
-import urllib.request 
+import urllib.request
 import ssl
 from functools import reduce
 from django.db.models import Q
@@ -112,7 +112,7 @@ def userfollowing(request,username):
 		userprofile_object = UserProfile.objects.get(user = userprofile_item)
 		following_userprofile.append(userprofile_object)
 
-	
+
 
 	return render(request, 'topics/userfollowing.html', {'userprofile': userprofile ,'following_userprofile':following_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
 
@@ -133,7 +133,7 @@ def topics(request):
 			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -141,7 +141,7 @@ def topics(request):
 			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -173,7 +173,7 @@ def explore(request):
 			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -181,7 +181,7 @@ def explore(request):
 			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -218,7 +218,7 @@ def exploretopic(request,topic_id):
 			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -226,7 +226,7 @@ def exploretopic(request,topic_id):
 			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -263,7 +263,7 @@ def explorelabel(request,label_id):
 			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -271,7 +271,7 @@ def explorelabel(request,label_id):
 			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
-				
+
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
@@ -1498,7 +1498,9 @@ def news(request):
 	json_datas = list()
 	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
 	json_data2 = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Added a new learning path to topic Impeachment", "type": "create", "actor": "Emre Yapar", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-	response = requests.get("http://127.0.0.1:3000/getAllActivities?actor=http://example/mahmutAoata")
+	response = requests.get("http://127.0.0.1:3000/getAllActivities?object=" + request._current_scheme_host + "/emre&type=follow" )
+	response.json()
+for
 
 	print (response.json()['-Lv1p3L2E2pR7poBug3E'])
 	json_datas.append(json_data)
