@@ -114,3 +114,95 @@ or
   "published" : "2015-02-10T15:04:55Z"
 }
 ```
+### Sending a get request using postman for retrieving activity stream based on 'TYPE':
+
+once your server is running type http://127.0.0.1:3000/getAllActivities?type=create for http address, and for http method select a get then click send then the response would be as following:
+
+```
+{
+    "-Lv1p3L2E2pR7poBug3E": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://example/mahmutAoata",
+        "object": "http://example.com/courseId4",
+        "published": "2015-02-10T15:04:55Z",
+        "summary": "mahmoud created a new topic",
+        "type": "create"
+    },
+    "-Lv1pEzU56gTuD004WOy": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://example/emre",
+        "object": "http://example.com/courseId34",
+        "published": "2015-02-10T15:04:55Z",
+        "summary": "emre followed a new topic",
+        "type": "create"
+    },
+    "-Lv5FNIKpNI16zx69kQ0": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://example/kasim",
+        "object": "http://example.com/courseId57",
+        "published": "2015-02-10T15:04:55Z",
+        "summary": "kasim created a new learning path with title body language",
+        "type": "create"
+    },
+    "-LvaTV5NHeKG7pq1VVBI": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": "http://127.0.0.1:8002/exploretopic/6",
+        "published": "2019-12-08T17:06:25Z",
+        "summary": "The User kasim2 added the topic 'testtest'",
+        "type": "create"
+    },
+    "-LvaZARnS3GqTzOSir-6": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": [
+            "http://127.0.0.1:8002/exploretopic/7"
+        ],
+        "published": "2019-12-08T17:31:14Z",
+        "summary": "The User kasim2 added the topic 'test2'",
+        "type": "create"
+    },
+    "-LvdpCMWa8nyFm0WF_gt": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://18.220.59.96:8002/Kaanaydin/",
+        "object": [
+            "http://18.220.59.96:8002/exploretopic/14"
+        ],
+        "published": "2019-12-09T08:44:30Z",
+        "summary": "The User Kaanaydin added the topic 'Autonomous Vehicles'",
+        "type": "create"
+    }
+}
+```
+### Sending a get request using postman for retrieving activity stream based on 'object':
+
+once your server is running type http://127.0.0.1:3000/getAllActivities?object=http://127.0.0.1:8002/exploretopic/6 for http address, and for http method select a get then click send then the response would be as following:
+
+```
+{
+    "-LvaTV5NHeKG7pq1VVBI": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": "http://127.0.0.1:8002/exploretopic/6",
+        "published": "2019-12-08T17:06:25Z",
+        "summary": "The User kasim2 added the topic 'testtest'",
+        "type": "create"
+    }
+}
+```
+### Sending a get request using postman for retrieving activity stream based on 'published':
+
+once your server is running type http://127.0.0.1:3000/getAllActivities?published=2019-12-08T17:06:25Z for http address, and for http method select a get then click send then the response would be as following:
+
+```
+{
+    "-LvaTV5NHeKG7pq1VVBI": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": "http://127.0.0.1:8002/exploretopic/6",
+        "published": "2019-12-08T17:06:25Z",
+        "summary": "The User kasim2 added the topic 'testtest'",
+        "type": "create"
+    }
+}
+```
