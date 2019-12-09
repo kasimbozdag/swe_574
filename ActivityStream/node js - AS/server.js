@@ -111,13 +111,67 @@ const server = http.createServer((request, response) => {
 
     console.log("jsonObj"+jsonObj);
     var body = [];
+    var query = [];
     body.push(jsonObj);
     console.log("body"+body);
     var val = JSON.parse(body);
     console.log("val"+val);
 
+    // check for type
+    if (val.hasOwnProperty('type')){
+      console.log("============= type");
 
-    if (val.hasOwnProperty('actor')){
+      ref.orderByChild("type").equalTo(val.type).on("value", function(snapshot) {
+
+      console.log(snapshot.key);
+      var data = snapshot.val();   //Data is in JSON format.
+      var res = JSON.stringify(data);
+      //
+    //  var rerturnedResponse = JSON.stringify(data);
+
+     //ref.push(jsonObj);
+     response.end(res);
+     console.log("json: "+res);
+
+
+    });
+  } else if (val.hasOwnProperty('object')){
+      console.log("============= object");
+
+      ref.orderByChild("object").equalTo(val.object).on("value", function(snapshot) {
+
+      console.log(snapshot.key);
+      var data = snapshot.val();   //Data is in JSON format.
+      var res = JSON.stringify(data);
+      //
+    //  var rerturnedResponse = JSON.stringify(data);
+
+     //ref.push(jsonObj);
+     response.end(res);
+     console.log("json: "+res);
+
+
+    });
+  }
+    // check all data for published
+    else if (val.hasOwnProperty('published')){
+      console.log("============= published");
+
+      ref.orderByChild("published").equalTo(val.published).on("value", function(snapshot) {
+
+      console.log(snapshot.key);
+      var data = snapshot.val();   //Data is in JSON format.
+      var res = JSON.stringify(data);
+      //
+    //  var rerturnedResponse = JSON.stringify(data);
+
+     //ref.push(jsonObj);
+     response.end(res);
+     console.log("json: "+res);
+
+
+    });
+  } else if (val.hasOwnProperty('actor')){
       console.log("============= has an actor");
       console.log("the actor is: "+val.actor);
 
