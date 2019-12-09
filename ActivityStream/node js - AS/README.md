@@ -206,3 +206,31 @@ once your server is running type http://127.0.0.1:3000/getAllActivities?publishe
     }
 }
 ```
+
+### Sending a get request using postman for retrieving activity stream based on 'actor':
+
+once your server is running type http://127.0.0.1:3000/getAllActivities?actor=http://127.0.0.1:8002/kasim2/ for http address, and for http method select a get then click send then the response would be as following:
+
+```
+{
+    "-LvaTV5NHeKG7pq1VVBI": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": "http://127.0.0.1:8002/exploretopic/6",
+        "published": "2019-12-08T17:06:25Z",
+        "summary": "The User kasim2 added the topic 'testtest'",
+        "type": "create"
+    },
+    "-LvaZARnS3GqTzOSir-6": {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "actor": "http://127.0.0.1:8002/kasim2/",
+        "object": [
+            "http://127.0.0.1:8002/exploretopic/7"
+        ],
+        "published": "2019-12-08T17:31:14Z",
+        "summary": "The User kasim2 added the topic 'test2'",
+        "type": "create"
+    }
+}
+```
+
