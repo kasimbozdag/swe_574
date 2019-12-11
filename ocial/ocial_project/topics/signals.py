@@ -8,8 +8,9 @@ from datetime import datetime
 from django.urls import reverse
 import requests
 
-#this is a signal that will trigger when a Topic instance is saved to db
-#if there are other time you want to call functions you can use pre_save, pre_delete, post_delete as argument insteaad of post_ssave
+
+# this is a signal that will trigger when a Topic instance is saved to db
+# if there are other time you want to call functions you can use pre_save, pre_delete, post_delete as argument insteaad of post_ssave
 @receiver(post_save, sender=Topic)
 def topic_post_save(sender, instance, **kwargs):
     obj = instance
@@ -22,10 +23,10 @@ def topic_post_save(sender, instance, **kwargs):
         if user.is_anonymous:
             actor = None
         else:
-            actor =scheme_host+ reverse("userprofile",kwargs={"username":user.username})
+            actor = scheme_host + reverse("userprofile", kwargs={"username": user.username})
     else:
         actor = None
-    object=scheme_host + "/exploretopic/" + str(obj.id),
+    object = scheme_host + "/exploretopic/" + str(obj.id)
     type = "create"
     summary = f"The User {user.username} added the topic '{obj.title}'"
     """
@@ -43,10 +44,11 @@ def topic_post_save(sender, instance, **kwargs):
 """
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
-        "summary":summary,
+        "summary": summary,
         "type": type,
         "actor": actor,
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    req=requests.post("http://activity_stream:3000/echo",json=activity)
+    print(activity)
+    req = requests.post("http://activity_stream:3000/echo", json=activity)
