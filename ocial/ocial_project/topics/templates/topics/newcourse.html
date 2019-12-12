@@ -1,114 +1,116 @@
-{% extends '../temp/classroom_base.html' %} 
-{% load static %} 
-{% block content %}
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.js"></script>
+{% extends '../temp/classroom_base.html' %} {% load static %} {% block content %}
+
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+<style type="text/css">
+    .separator {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #919191;
+}
+.separator::before, .separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ccc;
+}
+.separator::before {
+    margin-right: .25em;
+}
+.separator::after {
+    margin-left: .25em;
+}
+
+.close {display: none;}
+</style>
 
 <div class="container-fluid" style="margin-top:40px;">
 
     {% if error %}
 
-    <p style="color:red;" class="text-center"> {{error}} </p>
-
+    <div class="alert alert-danger" role="alert">
+{{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'newcourse' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
-
             <div class="row">
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}"> {% if course.id %}
+
                     <ul class="list-group mt-4" id="demo2">
-                        <div class="modal fade" id="sectionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog" role="document">
+                        <div class="modal fade" data-keyboard="false" data-backdrop="static" id="topicModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">New Section</h5>
+                                        <h5 class="modal-title" id="exampleModalLabel">Topic</h5>
                                         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                             <span aria-hidden="true">&times;</span>
                                         </button>
                                     </div>
-                                    <div class="modal-body">
-                                        <form>
-                                            <div class="form-group">
-                                                <input type="text" class="form-control" name="sectionname" placeholder="Section Name (Required)">
+                                    <div class="modal-body" style="height: 200px;">
+                                        
+                                            
+                                            <select class="form-control" name="topic">
+                                                <option disabled selected value="">Select Topic</option>
+                                                {% for topic in topics.all %} {% if topic.id == course.topic.id %}
+                                                <option selected value="{{ topic.id }}">{{ topic }}</option>
+                                                {% else %}
+                                                <option value="{{ topic.id }}">{{ topic }}</option>
+                                                {% endif %} {% endfor %}
+                                            </select>
+
+                                            <br/>
+                                            <div class="separator">&nbsp or &nbsp</div>
+                                            <br/>
+
+                                            <div class="input-group mb-3">
+                                                <input type="text" class="form-control" placeholder="Create New Topic" name="newtopic" aria-describedby="basic-addon2">
                                             </div>
-                                        </form>
+                                        
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                        <button type="submit" name="newsection" class="btn btn-danger">New Section</button>
+                                        <button type="submit" name="close" class="btn btn-secondary">Close</button>
+                                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#titleModal" data-whatever="@getbootstrap">Submit</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#sectionModal" data-whatever="@getbootstrap">New Section</button>
-
-                        {% for section in course.section_set.all %}
-                        <li class="list-group-item"><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a></li>
-                        {% endfor %}
-
-                    </ul>
-                    {% endif %}
-
-                    <br />
-
-                    <textarea type="text" class="form-control" name="description" rows="4" placeholder="Course Description">{{ course.description }}</textarea>
-                    <br />
-
-                    <textarea id="summernote" name="wywl">{{ course.wywl }}</textarea>
-                    <script>
-                        $('#summernote').summernote({
-                            placeholder: 'What they will learn?',
-                            tabsize: 1,
-                            height: 250
-                        });
-                    </script>
-
-                </div>
-
-                <div class="col-sm-4">
-                    {% if course.image %}
-                    <button type="submit" name="addglossary" class="btn btn-danger btn-block">Add Glossary</button>
-                    <br />
-                    <img src="{{ course.image.url }}" style="width:100%; height: auto"> {% endif %}
-                    <label for="exampleFormControlSelect1">Course Image</label>
-                    <input type="file" class="form-control-file" name="image">
-                    <br />
-                    <label for="exampleFormControlSelect1">Topic</label>
-                    <select class="form-control" name="topic">
-                        <option disabled selected value="">Select Topic (Required)</option>
-                        {% for topic in topics.all %} {% if topic.id == course.topic.id %}
-                        <option selected value="{{ topic.id }}">{{ topic }}</option>
-                        {% else %}
-                        <option value="{{ topic.id }}">{{ topic }}</option>
-                        {% endif %} {% endfor %}
-                    </select>
-                    <br />
-
-                        <div class="input-group mb-3">
-                            <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
-                            <div class="input-group-append">
-                                <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
+                            <div class="modal fade" data-keyboard="false" data-backdrop="static" id="titleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel">New Course</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body" style="height: 200px;">
+                                        
+                                            <div class="input-group mb-3" style="margin-top: 60px;">
+                                                <input type="text" class="form-control" placeholder="Course Title (Required)" name="title" aria-describedby="basic-addon2">
+                                            </div>
+                                       
+                                    </div>
+                                    <div class="modal-footer">
+                                         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="submit" name="submit" class="btn btn-danger">Submit</button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    {% if course.id %} {% if course.published == True %}
-                    <small>Published at: {{course.pub_date_exact}}</small> {% else %}
-                    <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
 
-                    <br />
+                    </ul>
 
-                    <button type="submit" name="save" class="btn btn-danger">Save</button>
-                    {% if course.id %}
-                    <button type="submit" name="publish" class="btn btn-danger">Publish</button>{% endif %}
-                </div>
-            </div>
-        </div>
     </form>
 
-</div>
+    <script type="text/javascript">
+        $(window).load(function() {
+            $('#topicModal').modal('show');
+        });
+    </script>
 
-{%endblock%}
+    </div>
+
+    {%endblock%}

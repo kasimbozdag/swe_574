@@ -482,10 +482,38 @@ def teacher(request):
 	courses = Course.objects.filter(teacher=teacher)
 	return render(request, 'topics/teacher.html',{'courses': courses , 'teacher': teacher})
 
-
-@login_required
 def newcourse(request):
 	topics = Topic.objects.all()
+
+	if request.method == 'POST':
+		if request.POST['newtopic']:
+			try:
+				topic = Topic.objects.get(title__iexact=request.POST['newtopic'])
+			except:
+				topic = Topic()
+				topic.title = request.POST['newtopic']
+				topic.save()			
+			course = Course()
+			course.topic = topic
+			savecourse(request,course)
+			return redirect('editcourse', course_id=course.id)
+			print(request.POST['newtopic'])
+			return redirect('teacher')
+		elif 'close' in request.POST:
+			return redirect('teacher')
+		elif request.POST['topic']:
+			course = Course()
+			savecourse(request,course)
+			return redirect('editcourse', course_id=course.id)
+	else:
+		return render(request, 'topics/newcourse.html',{'topics':topics})
+
+
+@login_required
+def newcourse_old(request):
+	topics = Topic.objects.all()
+	teacher = request.user
+
 	if request.method == 'POST':
 		if 'newtopic' in request.POST:
 			try:
@@ -510,14 +538,14 @@ def newcourse(request):
 					return redirect('editcourse', course_id=course.id)
 			return redirect('newcourse')
 		if 'save' in request.POST:
-			if request.POST['title'] and request.POST.getlist('topic'):
+			if request.POST['title'] and request.POST.get('topic'):
 				course = Course()
 				savecourse(request,course)
 				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})
 	else:
-		return render(request, 'topics/newcourse.html',{'topics': topics})
+		return render(request, 'topics/newcourse.html',{'teacher':teacher, 'topics': topics})
 
 @login_required
 @course_teacher_is_user
@@ -536,6 +564,7 @@ def editcourse(request,course_id):
 	course.save()
 
 	if request.method == 'POST':
+		print(request.method == 'POST')
 		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
@@ -592,13 +621,16 @@ def savecourse(request,course):
 		ordersection(request)
 
 	course.title = request.POST['title']
-	course.description = request.POST['description']
-	course.wywl = request.POST['wywl']
+	print(request.POST)
+	if 'description' in request.POST:
+		course.description = request.POST['description']
+		course.wywl = request.POST['wywl']
 	course.pubdate = timezone.datetime.now()
 	course.teacher = request.user
 
-	topic_title = request.POST.get('topic')
-	course.topic  = Topic.objects.get(id=topic_title)
+	if 'topic' in request.POST:
+		topic_title = request.POST.get('topic')
+		course.topic  = Topic.objects.get(id=topic_title)
 
 
 	if request.FILES.get('image', False):

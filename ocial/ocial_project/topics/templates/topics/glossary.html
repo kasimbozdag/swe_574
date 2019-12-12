@@ -12,8 +12,8 @@
 
     {% if error %}
 
-    <p style="color:red;" class="text-center"> {{error}} </p>
-
+    <div class="alert alert-danger" role="alert">
+{{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'glossary' course.id %}" enctype="multipart/form-data">

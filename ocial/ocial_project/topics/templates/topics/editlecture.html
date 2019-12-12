@@ -12,8 +12,8 @@
 
     {% if error %}
 
-    <p style="color:red;" class="text-center"> {{error}} </p>
-
+    <div class="alert alert-danger" role="alert">
+{{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'editlecture' lecture.id %}" enctype="multipart/form-data">
@@ -24,7 +24,13 @@
                 <div class="col-sm-8">
 
                     {% if lecture.id %}
-                    <small>{{lecture.section.course}} / {{lecture.section}}</small>
+                    <ul class="breadcrumb">
+                      
+                      <li>{{lecture.section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
+                      <li>{{lecture.section.course}}</a> <span class="divider">/&nbsp</span></li>
+                      <li>{{lecture.section}}</a> <span class="divider">/&nbsp</span></li>
+
+                    </ul>
                     {% endif %}
                     <input type="text" class="form-control" name="lecturetitle" placeholder="Lecture Title (Required)" value="{{ lecture.title }}">
 

@@ -49,8 +49,8 @@
 
     {% if error %}
 
-    <p style="color:red;" class="text-center"> {{error}} </p>
-
+    <div class="alert alert-danger" role="alert">
+{{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'editquiz' quiz.id %}" enctype="multipart/form-data">
@@ -62,8 +62,13 @@
                 <div class="col-sm-8">
 
                     {% if quiz.id %}                    
-                    <small>{{quiz.section.course}} / {{quiz.section}}</small>
-                    {% endif %}
+                    <ul class="breadcrumb">
+                      
+                      <li>{{quiz.section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
+                      <li>{{quiz.section.course}}</a> <span class="divider">/&nbsp</span></li>
+                      <li>{{quiz.section}}</a> <span class="divider">/&nbsp</span></li>
+
+                    </ul>                    {% endif %}
                     <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title (Required)" value="{{ quiz.title }}">
 
                     {%if quiz.isPublishable == False%}

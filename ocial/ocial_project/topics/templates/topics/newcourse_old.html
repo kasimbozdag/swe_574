@@ -1,0 +1,91 @@
+{% extends '../temp/classroom_base.html' %} 
+{% load static %} 
+{% block content %}
+
+<script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.11/summernote-lite.js"></script>
+
+<div class="container-fluid" style="margin-top:40px;">
+
+    {% if error %}
+
+    <div class="alert alert-danger" role="alert">
+{{error}} </div>
+    {%endif%}
+
+    <form method="POST" action="{% url 'newcourse' %}" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="row">
+                <div class="col-sm-8">
+                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}"> 
+
+                    <br />
+
+                    <textarea type="text" class="form-control" name="description" rows="4" placeholder="Course Description">{{ course.description }}</textarea>
+                    <br />
+
+                    <textarea id="summernote" name="wywl">{{ course.wywl }}</textarea>
+                    <script>
+                        $('#summernote').summernote({
+                            placeholder: 'What they will learn?',
+                            tabsize: 1,
+                            height: 250
+                        });
+                    </script>
+
+                </div>
+
+                <div class="col-sm-4">
+                    {% if course.image %}
+                    <button type="submit" name="addglossary" class="btn btn-danger btn-block">Add Glossary</button>
+                    <br />
+                    <img src="{{ course.image.url }}" style="width:100%; height: auto"> {% endif %}
+                    <label for="exampleFormControlSelect1">Course Image</label>
+                    <input type="file" class="form-control-file" name="image">
+                    <br />
+                    <label for="exampleFormControlSelect1">Topic</label>
+                    <select class="form-control" name="topic">
+                        <option disabled selected value="">Select Topic (Required)</option>
+                        {% for topic in topics.all %} {% if topic.id == course.topic.id %}
+                        <option selected value="{{ topic.id }}">{{ topic }}</option>
+                        {% else %}
+                        <option value="{{ topic.id }}">{{ topic }}</option>
+                        {% endif %} {% endfor %}
+                    </select>
+                    <br />
+
+                        <div class="input-group mb-3">
+                            <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-danger"  type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
+                            </div>
+                        </div>
+                    {% if course.id %} {% if course.published == True %}
+                    <small>Published at: {{course.pub_date_exact}}</small> {% else %}
+                    <small>Saved at: {{course.pub_date_exact}}</small> {% endif %} {% endif %}
+
+                    <br />
+
+                    <button type="submit" name="save" class="btn btn-danger">Save</button>
+                    {% if course.id %}
+                    <button type="submit" name="publish" class="btn btn-danger">Publish</button>{% endif %}
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+<script type="text/javascript">
+     $(window).load(function(){
+         $('#topicModal').modal('show');
+      });
+</script>
+
+</div>
+
+
+{%endblock%}
