@@ -1498,14 +1498,19 @@ def news(request):
 	json_datas = list()
 	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
 	json_data2 = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Added a new learning path to topic Impeachment", "type": "create", "actor": "Emre Yapar", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-	response = requests.get("http://127.0.0.1:3000/getAllActivities?object=" + request._current_scheme_host + "/emre&type=follow" )
-	response.json()
-for
+	response = requests.get("http://127.0.0.1:3000/getAllActivities?actor=" + request._current_scheme_host + "/emre/" )
+	res = response.json()
+	#print(res)
+	for r in res:
+		print(res[r]["actor"])
 
-	print (response.json()['-Lv1p3L2E2pR7poBug3E'])
-	json_datas.append(json_data)
-	json_datas.append(json_data2)
-	json_datas.append(json.dumps(response.json()['-Lv1p3L2E2pR7poBug3E']))
+	for r in res:
+		json_datas.append(res[r].value)
+
+	#print (response.json()['-Lv1p3L2E2pR7poBug3E'])
+	#json_datas.append(json_data)
+	#json_datas.append(json_data2)
+	#json_datas.append(json.dumps(response.json()['-Lv1p3L2E2pR7poBug3E']))
 	valid_jsons = list()
 
 	for json_data_ in json_datas:
