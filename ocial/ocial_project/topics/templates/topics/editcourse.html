@@ -59,16 +59,18 @@
 
             <div class="row">
                 <div class="col-sm-8">
-
+                    <small>
                     <ul class="breadcrumb">
 
                         <li>{{course.topic}}</a> <span class="divider">/</span></li>
 
                     </ul>
+                    </small> {%if course.isPublishable == False%}
 
-                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}">
-                    <br/> {%if course.isPublishable == False%}
-                    <small>Notice: In order to publish this course it must have at least one section and all sections must have green check(submitted) marks.</small> {%endif%} {% if course.id %}
+                    <div class="alert alert-danger" role="alert">
+
+                        <small>Notice: In order to publish this course it must have at least one section and all sections must have green check(submitted) marks.</small></div> {%endif%}
+                    <input type="text" class="form-control" name="title" placeholder="Title (Required)" value="{{ course.title }}"> {% if course.id %}
                     <input type="hidden" name="section-order" id="section-order">
 
                     <ul class="list-group mt-4" id="demo2">
@@ -89,7 +91,7 @@
 
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                                         <button type="submit" name="newsection" class="btn btn-danger"><i class="fas fa-folder-plus"></i> New Section</button>
                                     </div>
                                 </div>
@@ -104,7 +106,7 @@
                             <li class="item" data-id={{section.id}}><a href="{% url 'editsection' section.id %}">Section {{section.order}}: {{section.name}}</a> {%if section.isPublishable == True%}
                                 <i class="fas fa-check" style="color:green;"></i> {%endif%}
 
-                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-pill btn-outline-dark"><i class="far fa-trash-alt"></i></button>
 
                             </li>
 
@@ -137,7 +139,7 @@
 
                 <div class="col-sm-4">
 
-                    <button type="submit" name="addglossary" class="btn btn-danger btn-block"><i class="fas fa-plus"></i> Add Glossary</button>
+                    <button type="submit" name="addglossary" class="btn btn-outline-dark btn-block"><i class="fas fa-plus"></i> Add Glossary</button>
                     <br /> {% if course.image %}
                     <img src="{{ course.image.url }}" style="width:100%; height: auto"> {% endif %}
                     <br />
@@ -167,7 +169,7 @@
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" placeholder="New Topic" name="topictitle" aria-describedby="basic-addon2">
                         <div class="input-group-append">
-                            <button class="btn btn-danger" type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
+                            <button class="btn btn-outline-dark" type="submit" name="newtopic"><i class="fas fa-plus"></i> Add</button>
                         </div>
                     </div>
 
@@ -177,15 +179,15 @@
 
                     <br />
 
-                    <button type="submit" name="save" id="save" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    <button type="submit" name="save" id="save" class="btn btn-outline-dark btn-block"><i class="far fa-save"></i> Save</button>
 
-                    <button type="submit" name="save_exit" id="save_exit" class="btn btn-danger btn-block"> Save and Exit</button>
+                    <button type="submit" name="save_exit" id="save_exit" class="btn btn-outline-dark btn-block"> Save and Exit</button>
 
                     {% if course.id %} {% if course.isPublishable == True %}
                     <button type="submit" name="publish" id="publish" class="btn btn-danger btn-block">Publish</button>
                     {% endif %}
 
-                    <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-danger btn-block"><i class="far fa-trash-alt"></i> Delete</button>
+                    <button type="button" onclick="window.location.href='{% url 'deletecourse' course.id %}';" class="btn btn-outline-dark btn-block"><i class="far fa-trash-alt"></i> Delete</button>
 
                     {% endif %}
                 </div>

@@ -50,7 +50,7 @@
     {% if error %}
 
     <div class="alert alert-danger" role="alert">
-{{error}} </div>
+        {{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'editquestion' question.id %}" enctype="multipart/form-data">
@@ -62,20 +62,23 @@
                 <div class="col-sm-8">
 
                     {% if question.id %}
+                    <small>
+
                     <ul class="breadcrumb">
-                      
+
                       <li>{{question.quiz.section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
                       <li>{{question.quiz.section.course}}</a> <span class="divider">/&nbsp</span></li>
                       <li>{{question.quiz.section}}</a> <span class="divider">/&nbsp</span></li>
                       <li>{{question.quiz}}</a> <span class="divider">/&nbsp</span></li>
 
+                    </ul>      
+                                        </small> {% endif %} {%if question.isPublishable == False%}
+                    <div class="alert alert-danger" role="alert">
 
-                    </ul>                    {% endif %}
-                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Question (Required)" rows=4>{{ question.title }}</textarea>
-
-                    {%if question.isPublishable == False%}
-                    <small>Notice: In order to submit this question it must have at least one answer and one of the answers must be selected as Correct.</small> 
+                        <small>Notice: In order to submit this question it must have at least one answer and one of the answers must be selected as Correct.</small> </div>
                     {%endif%}
+
+                    <textarea type="text" class="form-control" name="questiontitle" placeholder="Question (Required)" rows=4>{{ question.title }}</textarea>
 
                     <input type="hidden" name="choice-order" id="choice-order">
 
@@ -98,7 +101,7 @@
                                         </form>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                                         <button type="submit" name="newchoice" class="btn btn-danger"><i class="fas fa-check"></i> New Answer</button>
                                     </div>
                                 </div>
@@ -124,7 +127,7 @@
                                         </div>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                                         <button type="submit" class="btn btn-danger" name="choicetitleedit">Edit Answer</button>
                                     </div>
                                 </div>
@@ -148,12 +151,11 @@
 
                             {% for choice in question.choice_set.all %}
                             <li class="item" data-id={{choice.id}}>
-                                <input type="radio" name="choice-radio" value="{{choice.id}}" 
-                                {%if choice.isTrue == True%} checked="checked" {%endif%}> {{choice.title}}
+                                <input type="radio" name="choice-radio" value="{{choice.id}}" {%if choice.isTrue==T rue%} checked="checked" {%endif%}> {{choice.title}}
 
-                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletechoice' choice.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletechoice' choice.id %}';" class="btn btn-pill btn-outline-dark"><i class="far fa-trash-alt"></i></button>
 
-                                <button style="float: right;" type="button" class="btn btn-danger" data-toggle="modal" data-target="#choiceEditModal" data-id="{{choice.id}}" data-whatever="{{choice.title}}"><i class="fas fa-edit"></i></button>
+                                <button style="float: right;" type="button" class="btn btn-outline-dark" data-toggle="modal" data-target="#choiceEditModal" data-id="{{choice.id}}" data-whatever="{{choice.title}}"><i class="fas fa-edit"></i></button>
 
                             </li>
 
@@ -168,21 +170,19 @@
                     <br />
                     <div class="form-inline">
 
-                        <button type="submit" name="save_question" id="save_question" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                        <button type="submit" name="save_question" id="save_question" class="btn btn-outline-dark btn-block"><i class="far fa-save"></i> Save</button>
 
-                        {% if question.id %}
-
-                        {% if question.isPublishable == True %}
+                        {% if question.id %} {% if question.isPublishable == True %}
 
                         <button type="submit" name="submit_question" id="submit_question" class="btn btn-danger btn-block">Submit</button>
 
                         {%else%}
 
-                        <button type="submit" name="save_exit_question" id="save_exit_question" class="btn btn-danger btn-block">Save and Exit</button>
+                        <button type="submit" name="save_exit_question" id="save_exit_question" class="btn btn-outline-dark btn-block">Save and Exit</button>
 
-                         {%endif%}
+                        {%endif%}
 
-                        <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Question</button>
+                        <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-block btn-outline-dark" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Question</button>
 
                         {% endif %}
 
@@ -207,8 +207,6 @@
             sendQuestionOrder()
         };
 
-
-
         function sendQuestionOrder() {
 
             var choiceorder = document.getElementById("choice-order");
@@ -219,11 +217,9 @@
     </script>
 
     <script type="text/javascript">
-        
         document.getElementById("save_exit_question").onclick = function() {
             sendQuestionOrder()
         };
-        
     </script>
 
     </div>

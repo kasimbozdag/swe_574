@@ -24,6 +24,8 @@
                 <div class="col-sm-8">
 
                     {% if lecture.id %}
+                                        <small>
+
                     <ul class="breadcrumb">
                       
                       <li>{{lecture.section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
@@ -31,6 +33,8 @@
                       <li>{{lecture.section}}</a> <span class="divider">/&nbsp</span></li>
 
                     </ul>
+                                        </small>
+
                     {% endif %}
                     <input type="text" class="form-control" name="lecturetitle" placeholder="Lecture Title (Required)" value="{{ lecture.title }}">
 
@@ -51,14 +55,14 @@
 
                     <br />
 
-                    <button type="submit" name="save_lecture" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    <button type="submit" name="save_lecture" class="btn btn-outline-dark btn-block"><i class="far fa-save"></i> Save</button>
 
                     {% if lecture.id %}
 
                     
                     <button type="submit" name="submit_lecture" class="btn btn-danger btn-block">Submit</button>
 
-                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' lecture.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Lecture</button>
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' lecture.id %}';" class="btn btn-block btn-outline-dark" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Lecture</button>
 
                     {% endif %}
 

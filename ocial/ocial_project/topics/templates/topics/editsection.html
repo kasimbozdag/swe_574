@@ -43,7 +43,7 @@
     {% if error %}
 
     <div class="alert alert-danger" role="alert">
-{{error}} </div>
+        {{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'editsection' section.id %}" enctype="multipart/form-data">
@@ -54,19 +54,21 @@
             <div class="row">
                 <div class="col-sm-8">
                     {% if section.id %}
+                    <small>
+
                     <ul class="breadcrumb">
-                      
+
                       <li>{{section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
                       <li>{{section.course}}</a> <span class="divider">/&nbsp</span></li>
 
                     </ul>
-                    {% endif %}
-                    <input type="text" class="form-control" name="sectionname" placeholder="Section Name (Required)" value="{{ section.name }}">
+                                        </small> {% endif %} {%if section.isPublishable == False%}
+                    <div class="alert alert-danger" role="alert">
 
-            
-                    {%if section.isPublishable == False%}
-                    <small>Notice: In order to submit this section it must have at least one lecture/quiz and all lectures/quizzes must have green check(submitted) marks.</small> 
+                        <small>Notice: In order to submit this section it must have at least one lecture/quiz and all lectures/quizzes must have green check(submitted) marks.</small> </div>
                     {%endif%}
+
+                    <input type="text" class="form-control" name="sectionname" placeholder="Section Name (Required)" value="{{ section.name }}">
 
                     <br />
 
@@ -89,7 +91,7 @@
                                     </form>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary " data-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-dark " data-dismiss="modal">Close</button>
                                     <button type="submit" name="newquiz" class="btn btn-danger "><i class="fas fa-question"></i> New Quiz </button>
                                     <button type="submit" name="newlecture" class="btn btn-danger "><i class="fas fa-chalkboard-teacher"></i> New Lecture</button>
                                 </div>
@@ -99,8 +101,7 @@
 
                     {%if section.isLinked == True%}
                     <input type="checkbox" name="sectionislinked" value="True" checked> Linked Section {% elif section.isLinked == False%}
-                    <input type="checkbox" name="sectionislinked" value="True"> Linked Section 
-                    {% endif %}
+                    <input type="checkbox" name="sectionislinked" value="True"> Linked Section {% endif %}
                     <br />
                     <br />
 
@@ -110,26 +111,20 @@
 
                     <ul class="grid">
 
-                        {% for pathitem in learningpath %} 
-
-                        {%if pathitem|verbose_name == "Lecture" %}
+                        {% for pathitem in learningpath %} {%if pathitem|verbose_name == "Lecture" %}
 
                         <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editlecture' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
 
-                            <i class="fas fa-check" style="color:green;"></i> 
+                            <i class="fas fa-check" style="color:green;"></i>
 
-
-                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletelecture' pathitem.id %}';" class="btn btn-pill btn-outline-default"><i class="far fa-trash-alt"></i></button>
 
                             {%else%}
 
-                            <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a>
+                            <li class="item" data-id={{pathitem|verbose_name}}:{{pathitem.id}}><a href="{% url 'editquiz' pathitem.id%}">{{pathitem.order}}. {{pathitem|verbose_name}}: {{pathitem.title}}</a> {%if pathitem.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> {%endif%}
 
-                                {%if pathitem.isPublishable == True%}
-                                <i class="fas fa-check" style="color:green;"></i> 
-                                {%endif%}
-
-                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' pathitem.id %}';" class="btn btn-pill btn-outline-default"><i class="far fa-trash-alt"></i></button>
 
                                 {%endif%}
 
@@ -170,20 +165,20 @@
 
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                                    <button type="submit" name="addresource" class="btn btn-danger"><i class="fas fa-plus"></i> Add Resource</button>
+                                    <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Close</button>
+                                    <button type="submit" name="addresource" class="btn btn-outline-dark"><i class="fas fa-plus"></i> Add Resource</button>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
+                    <button type="button" class="btn btn-outline-dark btn-block" data-toggle="modal" data-target="#resourceModal" data-whatever="@getbootstrap"><i class="fas fa-plus"></i> Add Resource</button>
 
                     <ul class="list-group mt-4">
                         {% for resource in section.resource_set.all %}
                         <li class="list-group-item"><a target="_blank" href="{{resource.link.url}}">{{resource.name}}</a>
 
-                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                            <button style="float: right;" type="button" onclick="window.location.href='{% url 'deleteresource' resource.id %}';" class="btn btn-outline-default"><i class="far fa-trash-alt"></i></button>
 
                         </li>
                         {% endfor %}
@@ -192,23 +187,19 @@
 
                     <br /> {% endif %}
 
-                    <button type="submit" name="save_section" id="save_section" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    <button type="submit" name="save_section" id="save_section" class="btn btn-outline-dark btn-block"><i class="far fa-save"></i> Save</button>
 
-                    
-                    {% if section.id %}
-
-                    {% if section.isPublishable == True %}
+                    {% if section.id %} {% if section.isPublishable == True %}
 
                     <button type="submit" name="submit_section" id="submit_section" class="btn btn-danger btn-block">Submit</button>
 
                     {%else%}
 
-                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-danger btn-block">Save and Exit</button>
+                    <button type="submit" name="save_exit_section" id="save_exit_section" class="btn btn-outline-dark btn-block">Save and Exit</button>
 
                     {% endif %}
 
-
-                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletesection' section.id %}';" class="btn btn-block btn-outline-dark" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Section</button>
 
                     {% endif %}
                 </div>
@@ -240,7 +231,6 @@
     </script>
 
     <script type="text/javascript">
-        
         document.getElementById("save_exit_section").onclick = function() {
             sendLPOrder()
         };

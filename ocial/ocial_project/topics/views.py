@@ -564,18 +564,17 @@ def editcourse(request,course_id):
 	course.save()
 
 	if request.method == 'POST':
-		print(request.method == 'POST')
-		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
 		elif 'newsection' in request.POST:
-			numberofsections = course.section_set.count()
-			section = Section()
-			section.name = request.POST['sectionname']
-			section.course = course
-			section.order = numberofsections +1
-			section.save()
-			return redirect('editsection', section_id=section.id)
+			if request.POST['sectionname']:
+				numberofsections = course.section_set.count()
+				section = Section()
+				section.name = request.POST['sectionname']
+				section.course = course
+				section.order = numberofsections +1
+				section.save()
+				return redirect('editsection', section_id=section.id)
 		elif 'newtopic' in request.POST:
 			try:
 				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
@@ -779,8 +778,6 @@ def editsection(request,section_id):
 
 
 	if request.method == 'POST':
-		print(request.POST)
-		savesection(request,section)
 		if 'save_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
@@ -961,7 +958,6 @@ def editquiz(request, quiz_id):
 		quiz.isPublishable = False
 
 	if request.method == 'POST':
-			savequiz(request,quiz)
 			if 'save_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
@@ -1055,13 +1051,12 @@ def editquestion(request, question_id):
 		question.isPublishable = False
 
 	if request.method == 'POST':
-			savequestion(request,question)
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
 					return redirect('editquestion', question_id=question.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})
+					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Quiz title field is required'})
 			if 'save_exit_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
