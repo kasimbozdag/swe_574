@@ -1496,16 +1496,17 @@ def news(request):
 
 	print(following)
 	json_datas = list()
-	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-	json_data2 = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Added a new learning path to topic Impeachment", "type": "create", "actor": "Emre Yapar", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-	response = requests.get("http://127.0.0.1:3000/getAllActivities?actor=" + request._current_scheme_host + "/emre/" )
+	response = requests.get("http://127.0.0.1:3000/getAllActivities?actor=" + request._current_scheme_host + "/" + userprofile.user.username + "/" )
 	res = response.json()
-	#print(res)
-	for r in res:
-		print(res[r]["actor"])
-
-	for r in res:
-		json_datas.append(res[r].value)
+	print(request.user)
+	print("res : ")
+	print(res)
+	if res is not None:
+		for r in res:
+			print(res.get(r))
+	if res is not None:
+		for r in res:
+			json_datas.append(json.dumps(res.get(r)))
 
 	#print (response.json()['-Lv1p3L2E2pR7poBug3E'])
 	#json_datas.append(json_data)
