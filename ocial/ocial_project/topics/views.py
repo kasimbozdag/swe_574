@@ -138,7 +138,15 @@ def topics(request):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
+			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+
+			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -178,13 +186,24 @@ def explore(request):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=5"
+
+			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
 
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
+
+		print(search_list)
+
 
 
 		if search_query != None:
@@ -223,7 +242,15 @@ def exploretopic(request,topic_id):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
+
+			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -268,7 +295,15 @@ def explorelabel(request,label_id):
 			for i in range(0,len(data)):
 				search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sl=" + search_query.replace(" ", "+") + "&max=15"
+
+			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+			with urllib.request.urlopen(url) as url:
+				data = json.loads(url.read().decode())
+
+			for i in range(0,len(data)):
+				search_list.append(data[i]['word'])
+
+			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
 			with urllib.request.urlopen(url) as url:
 				data = json.loads(url.read().decode())
 				
@@ -447,10 +482,38 @@ def teacher(request):
 	courses = Course.objects.filter(teacher=teacher)
 	return render(request, 'topics/teacher.html',{'courses': courses , 'teacher': teacher})
 
-
-@login_required
 def newcourse(request):
 	topics = Topic.objects.all()
+
+	if request.method == 'POST':
+		if request.POST['newtopic']:
+			try:
+				topic = Topic.objects.get(title__iexact=request.POST['newtopic'])
+			except:
+				topic = Topic()
+				topic.title = request.POST['newtopic']
+				topic.save()			
+			course = Course()
+			course.topic = topic
+			savecourse(request,course)
+			return redirect('editcourse', course_id=course.id)
+			print(request.POST['newtopic'])
+			return redirect('teacher')
+		elif 'close' in request.POST:
+			return redirect('teacher')
+		elif request.POST['topic']:
+			course = Course()
+			savecourse(request,course)
+			return redirect('editcourse', course_id=course.id)
+	else:
+		return render(request, 'topics/newcourse.html',{'topics':topics})
+
+
+@login_required
+def newcourse_old(request):
+	topics = Topic.objects.all()
+	teacher = request.user
+
 	if request.method == 'POST':
 		if 'newtopic' in request.POST:
 			try:
@@ -475,14 +538,14 @@ def newcourse(request):
 					return redirect('editcourse', course_id=course.id)
 			return redirect('newcourse')
 		if 'save' in request.POST:
-			if request.POST['title'] and request.POST.getlist('topic'):
+			if request.POST['title'] and request.POST.get('topic'):
 				course = Course()
 				savecourse(request,course)
 				return redirect('editcourse', course_id=course.id)
 			else:
 				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})
 	else:
-		return render(request, 'topics/newcourse.html',{'topics': topics})
+		return render(request, 'topics/newcourse.html',{'teacher':teacher, 'topics': topics})
 
 @login_required
 @course_teacher_is_user
@@ -501,17 +564,17 @@ def editcourse(request,course_id):
 	course.save()
 
 	if request.method == 'POST':
-		savecourse(request,course)
 		if 'addglossary' in request.POST:
 			return redirect('glossary', course_id=course.id)
 		elif 'newsection' in request.POST:
-			numberofsections = course.section_set.count()
-			section = Section()
-			section.name = request.POST['sectionname']
-			section.course = course
-			section.order = numberofsections +1
-			section.save()
-			return redirect('editsection', section_id=section.id)
+			if request.POST['sectionname']:
+				numberofsections = course.section_set.count()
+				section = Section()
+				section.name = request.POST['sectionname']
+				section.course = course
+				section.order = numberofsections +1
+				section.save()
+				return redirect('editsection', section_id=section.id)
 		elif 'newtopic' in request.POST:
 			try:
 				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
@@ -557,13 +620,16 @@ def savecourse(request,course):
 		ordersection(request)
 
 	course.title = request.POST['title']
-	course.description = request.POST['description']
-	course.wywl = request.POST['wywl']
+	print(request.POST)
+	if 'description' in request.POST:
+		course.description = request.POST['description']
+		course.wywl = request.POST['wywl']
 	course.pubdate = timezone.datetime.now()
 	course.teacher = request.user
 
-	topic_title = request.POST.get('topic')
-	course.topic  = Topic.objects.get(id=topic_title)
+	if 'topic' in request.POST:
+		topic_title = request.POST.get('topic')
+		course.topic  = Topic.objects.get(id=topic_title)
 
 
 	if request.FILES.get('image', False):
@@ -712,8 +778,6 @@ def editsection(request,section_id):
 
 
 	if request.method == 'POST':
-		print(request.POST)
-		savesection(request,section)
 		if 'save_section' in request.POST:
 			if request.POST['sectionname']:
 				savesection(request,section)
@@ -894,7 +958,6 @@ def editquiz(request, quiz_id):
 		quiz.isPublishable = False
 
 	if request.method == 'POST':
-			savequiz(request,quiz)
 			if 'save_quiz' in request.POST:
 				if request.POST['quiztitle']:
 					savequiz(request,quiz)
@@ -988,13 +1051,12 @@ def editquestion(request, question_id):
 		question.isPublishable = False
 
 	if request.method == 'POST':
-			savequestion(request,question)
 			if 'save_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)
 					return redirect('editquestion', question_id=question.id)
 				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})
+					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Quiz title field is required'})
 			if 'save_exit_question' in request.POST:
 				if request.POST['questiontitle']:
 					savequestion(request,question)

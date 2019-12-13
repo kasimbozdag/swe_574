@@ -12,7 +12,7 @@ class Topic(models.Model):
 		return self.title
 
 class Course(models.Model):
-	title = models.CharField(max_length=200)
+	title = models.CharField(max_length=200,blank=False)
 	pubdate = models. DateTimeField()
 	image = models.ImageField(upload_to='images/', default= '../static/default.jpg')
 	description = models.TextField(blank=True)
