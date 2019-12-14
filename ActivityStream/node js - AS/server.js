@@ -30,6 +30,11 @@ var errorWrongEntry = {
   responseDescription : "Error! wrong entry please check the data that to be queryed "
   // type : "Follow"
 };
+var errorMissingOrWrongEntry = {
+  responseCode : "2",
+  responseDescription : "Error! Missing or Wrong Entry Please check the properties that have been set."
+  // type : "Follow"
+};
 serverResponse[JsonBody] = [];
 serverResponse[JsonBody].push(data);
 
@@ -122,7 +127,7 @@ const server = http.createServer((request, response) => {
     console.log("body"+body);
     var val = JSON.parse(body);
     console.log("val"+val);
-    SearchActivityDictionary(val,queryFlag,query);
+    SearchActivityDictionary(val,queryFlag,query,response);
 
     //check for 
     if (val.hasOwnProperty('published') && val.hasOwnProperty('object') && val.hasOwnProperty('actor')){
@@ -355,14 +360,16 @@ console.log("SearchActivityStream: successful request!");
 
 //MARK: - SEARCH ACTIVITY STREAM BASED ON A DICTIONARY
 
-function SearchActivityDictionary(dict,queryFlag,query){
+function SearchActivityDictionary(dict,queryFlag,query,response){
 
   console.log("Running SearchActivityDictionary.. "+dict);
   var count = Object.keys(dict).length;
   console.log("dict length: "+count);
   var numOfProperties = false;
   var keys = [];
-  if (count === 3){
+  var Ids = [];
+  var finalResult = {};
+  if (count === 3) {
       console.log("count: "+count);
   var index = 0;
   for (val in dict) {
@@ -427,6 +434,8 @@ console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
       if (queryFlag === 3){
           query.push(childData);
           queryFlag = 0;
+          Ids.push(ID);
+          finalResult[ID] = childData;
           console.log(queryFlag);
 
           console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
@@ -443,12 +452,279 @@ console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
     //  var childData = childSnapshot.val();
   });
   });
-console.log("result====");
+console.log("SearchActivityDictionary: result");
 console.log(query);
+console.log("SearchActivityDictionary: Ids: "+Ids);
+console.log("SearchActivityDictionary: "+finalResult);
+var res = JSON.stringify(finalResult);
+//response.end(res);
+try{
+
+var responseStatus = query.length;
+console.log("responseStatus "+responseStatus);
+if (responseStatus > 0){
+  response.end(res);
+  console.log("res success");
+}else{
+  console.log("empty result");
+     var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+     // json output
+     response.end(rerturnedResponse);
+//errorMissingOrWrongEntry
+//response.end(errorMissingOrWrongEntry);
+}
+
+
+}catch(error){
+  console.log("error: "+error);
+}
+
+//console.log("SearchActivityDictionary: finalResult "+res);
+
+
 });
 
 
 
+
+}else if (count === 4){
+// do the logic behind that
+      console.log("count: "+count);
+  var index = 0;
+  for (val in dict) {
+    console.log("value: "+dict[val]);
+    console.log("key: "+val);
+    console.log("===========/========");
+    keys[index] = val;
+    index++;
+  }
+console.log("keys: "+keys[0]);
+console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
+
+
+
+// get data from firebase
+        ref.once("value").then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      // key will be "ada" the first time and "alan" the second time
+      var ID = childSnapshot.key;
+      console.log("============ ID");
+      console.log(ID);
+      console.log("============ ID");
+      // childData will be the actual contents of the child
+      var childData = childSnapshot.val();
+      console.log(childData);
+       var i = 0;
+      childSnapshot.forEach(function(childSnapshot2) {
+      // key will be "ada" the first time and "alan" the second time
+      i = i + 1;
+      console.log("counter: "+i);
+
+      var key = childSnapshot2.key;
+      var value = childSnapshot2.val();
+
+      // console.log("//============//");
+      // console.log(key);
+      // console.log(value);
+ //     console.log("//============//");
+      if (key === keys[0] && value === dict[keys[0]]){
+        console.log("****");
+        console.log(keys[0]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+       if (key === keys[1] && value === dict[keys[1]]){
+        console.log("****");
+        console.log(keys[1]);
+        console.log("*****");
+        queryFlag = queryFlag + 1;
+
+      } 
+       if (key === keys[2] && value === dict[keys[2]]){
+        console.log("****");
+        console.log(dict[keys[2]]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+
+      if (key === keys[3] && value === dict[keys[3]]){
+        console.log("****");
+        console.log(dict[keys[3]]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+      }
+
+      console.log("queryFlag");
+      console.log(queryFlag);
+      if (queryFlag === count){
+          query.push(childData);
+          queryFlag = 0;
+          Ids.push(ID);
+          finalResult[ID] = childData;
+          console.log(queryFlag);
+
+          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+      }
+
+      if(i === 6){
+        i = 0;
+        queryFlag = 0;
+
+      } 
+
+      // childData will be the actual contents of the child
+    //  var childData = childSnapshot.val();
+  });
+  });
+console.log("SearchActivityDictionary: result");
+console.log(query);
+console.log("SearchActivityDictionary: Ids: "+Ids);
+console.log("SearchActivityDictionary: "+finalResult);
+var res = JSON.stringify(finalResult);
+//response.end(res);
+try{
+
+var responseStatus = query.length;
+console.log("responseStatus "+responseStatus);
+if (responseStatus > 0){
+  response.end(res);
+  console.log("res success");
+}else{
+  console.log("empty result");
+     var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+     // json output
+     response.end(rerturnedResponse);
+//errorMissingOrWrongEntry
+//response.end(errorMissingOrWrongEntry);
+}
+
+
+}catch(error){
+  console.log("error: "+error);
+}
+
+//console.log("SearchActivityDictionary: finalResult "+res);
+
+
+});
+
+
+
+
+
+
+
+}else if (count === 2){
+        console.log("count: "+count);
+  var index = 0;
+  for (val in dict) {
+    console.log("value: "+dict[val]);
+    console.log("key: "+val);
+    console.log("===========/========");
+    keys[index] = val;
+    index++;
+  }
+console.log("keys: "+keys[0]);
+console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
+
+
+
+// get data from firebase
+        ref.once("value").then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      // key will be "ada" the first time and "alan" the second time
+      var ID = childSnapshot.key;
+      console.log("============ ID");
+      console.log(ID);
+      console.log("============ ID");
+      // childData will be the actual contents of the child
+      var childData = childSnapshot.val();
+      console.log(childData);
+       var i = 0;
+      childSnapshot.forEach(function(childSnapshot2) {
+      // key will be "ada" the first time and "alan" the second time
+      i = i + 1;
+      console.log("counter: "+i);
+
+      var key = childSnapshot2.key;
+      var value = childSnapshot2.val();
+
+      // console.log("//============//");
+      // console.log(key);
+      // console.log(value);
+ //     console.log("//============//");
+      if (key === keys[0] && value === dict[keys[0]]){
+        console.log("****");
+        console.log(keys[0]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+       if (key === keys[1] && value === dict[keys[1]]){
+        console.log("****");
+        console.log(keys[1]);
+        console.log("*****");
+        queryFlag = queryFlag + 1;
+
+      } 
+
+      console.log("queryFlag");
+      console.log(queryFlag);
+      if (queryFlag === count){
+          query.push(childData);
+          queryFlag = 0;
+          Ids.push(ID);
+          finalResult[ID] = childData;
+          console.log(queryFlag);
+
+          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+      }
+
+      if(i === 6){
+        i = 0;
+        queryFlag = 0;
+
+      } 
+
+      // childData will be the actual contents of the child
+    //  var childData = childSnapshot.val();
+  });
+  });
+console.log("SearchActivityDictionary: result");
+console.log(query);
+console.log("SearchActivityDictionary: Ids: "+Ids);
+console.log("SearchActivityDictionary: "+finalResult);
+var res = JSON.stringify(finalResult);
+//response.end(res);
+try{
+
+var responseStatus = query.length;
+console.log("responseStatus "+responseStatus);
+if (responseStatus > 0){
+  response.end(res);
+  console.log("res success");
+}else{
+  console.log("empty result");
+     var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+     // json output
+     response.end(rerturnedResponse);
+//errorMissingOrWrongEntry
+//response.end(errorMissingOrWrongEntry);
+}
+
+
+}catch(error){
+  console.log("error: "+error);
+}
+
+//console.log("SearchActivityDictionary: finalResult "+res);
+
+
+});
 
 }
 
