@@ -70,7 +70,7 @@ def question_teacher_is_user(function):
 def choice_teacher_is_user(function):
     def wrap(request, *args, **kwargs):
         choice = Choice.objects.get(pk=kwargs['choice_id'])
-        if choice.quiz.section.course.teacher == request.user:
+        if choice.question.quiz.section.course.teacher == request.user:
             return function(request, *args, **kwargs)
         else:
             raise PermissionDenied

@@ -49,8 +49,8 @@
 
     {% if error %}
 
-    <p style="color:red;" class="text-center"> {{error}} </p>
-
+    <div class="alert alert-danger" role="alert">
+        {{error}} </div>
     {%endif%}
 
     <form method="POST" action="{% url 'editquiz' quiz.id %}" enctype="multipart/form-data">
@@ -61,14 +61,21 @@
             <div class="row">
                 <div class="col-sm-8">
 
-                    {% if quiz.id %}                    
-                    <small>{{quiz.section.course}} / {{quiz.section}}</small>
-                    {% endif %}
-                    <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title (Required)" value="{{ quiz.title }}">
+                    {% if quiz.id %}
+                    <small>
 
-                    {%if quiz.isPublishable == False%}
-                    <small>Notice: In order to submit this quiz it must have at least one question and all questions must have green check(submitted) marks.</small> 
+                    <ul class="breadcrumb">
+
+                      <li>{{quiz.section.course.topic}}</a> <span class="divider">/ &nbsp</span></li>
+                      <li>{{quiz.section.course}}</a> <span class="divider">/&nbsp</span></li>
+                      <li>{{quiz.section}}</a> <span class="divider">/&nbsp</span></li>
+
+                    </ul>                            </small> {% endif %} {%if quiz.isPublishable == False%}
+                    <div class="alert alert-danger" role="alert">
+
+                        <small>Notice: In order to submit this quiz it must have at least one question and all questions must have green check(submitted) marks.</small> </div>
                     {%endif%}
+                    <input type="text" class="form-control" name="quiztitle" placeholder="Quiz Title (Required)" value="{{ quiz.title }}">
 
                     <input type="hidden" name="question-order" id="question-order">
 
@@ -90,7 +97,7 @@
                                         </form>
                                     </div>
                                     <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
                                         <button type="submit" name="newquestion" class="btn btn-danger"><i class="fas fa-question"></i> New Question</button>
                                     </div>
                                 </div>
@@ -102,13 +109,10 @@
                         <ul class="grid">
 
                             {% for question in quiz.question_set.all %}
-                            <li class="item" data-id={{question.id}}><a href="{% url 'editquestion' question.id %}">Question {{question.order}}: {{question.title}}</a>
+                            <li class="item" data-id={{question.id}}><a href="{% url 'editquestion' question.id %}">Question {{question.order}}: {{question.title}}</a> {%if question.isPublishable == True%}
+                                <i class="fas fa-check" style="color:green;"></i> {%endif%}
 
-                                {%if question.isPublishable == True%}
-                                <i class="fas fa-check" style="color:green;"></i> 
-                                {%endif%}
-
-                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-pill btn-outline-danger"><i class="far fa-trash-alt"></i></button>
+                                <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequestion' question.id %}';" class="btn btn-pill btn-outline-dark"><i class="far fa-trash-alt"></i></button>
 
                             </li>
 
@@ -133,21 +137,19 @@
 
                     <br />
 
-                    <button type="submit" name="save_quiz" id="save_quiz" class="btn btn-danger btn-block"><i class="far fa-save"></i> Save</button>
+                    <button type="submit" name="save_quiz" id="save_quiz" class="btn btn-outline-dark btn-block"><i class="far fa-save"></i> Save</button>
 
-                    {% if quiz.id %}
-                    
-                    {%if quiz.isPublishable == True%}
+                    {% if quiz.id %} {%if quiz.isPublishable == True%}
 
                     <button type="submit" name="submit_quiz" id="submit_quiz" class="btn btn-danger btn-block">Submit</button>
 
                     {%else%}
 
-                    <button type="submit" name="save_exit_quiz" id="save_exit_quiz" class="btn btn-danger btn-block">Save and Exit</button>
+                    <button type="submit" name="save_exit_quiz" id="save_exit_quiz" class="btn btn-outline-dark btn-block">Save and Exit</button>
 
                     {%endif%}
 
-                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' quiz.id %}';" class="btn btn-block btn-outline-danger" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Quiz</button>
+                    <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletequiz' quiz.id %}';" class="btn btn-block btn-outline-dark" style="margin-bottom: 5px;"><i class="far fa-trash-alt"></i> Delete Quiz</button>
 
                     {% endif %}
 
@@ -168,10 +170,9 @@
             sendQuestionOrder()
         };
 
-                document.getElementById("submit_quiz").onclick = function() {
+        document.getElementById("submit_quiz").onclick = function() {
             sendQuestionOrder()
         };
-
 
         function sendQuestionOrder() {
 
@@ -180,16 +181,12 @@
             questionorder.form.submit();
 
         }
-
     </script>
 
     <script type="text/javascript">
-
-
         document.getElementById("save_exit_quiz").onclick = function() {
             sendQuestionOrder()
         };
-
     </script>
 
 </div>
