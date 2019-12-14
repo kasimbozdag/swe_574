@@ -2,6 +2,8 @@
 var firebase = require("firebase");
 const http = require('http');
 const url = require('url');
+//const Dictionary = require('dictionaryjs');
+
 //const databaseF = require('./app.js');
 //var name = databaseF.fileName; 
 
@@ -10,6 +12,7 @@ const port = 3000;
 var express = require("express");
 var app = express();
 var serverResponse = {};
+//var dict = new Dictionary();
 
 var JsonBody = "Response";
 var data = {
@@ -104,7 +107,7 @@ const server = http.createServer((request, response) => {
 
   }else if (request.method === "GET" ){
     //  && request.url === '/getActorActivity' 
-    console.log("Received a get request for getActorActivity");
+    console.log("Received a get request..");
     var url_parts = url.parse(request.url,true);
     console.log(url_parts.query);
     var jsonObj = JSON.stringify( url_parts.query );
@@ -112,13 +115,100 @@ const server = http.createServer((request, response) => {
     console.log("jsonObj"+jsonObj);
     var body = [];
     var query = [];
+    var queryFlag = 0;
+   // var querystatus
+
     body.push(jsonObj);
     console.log("body"+body);
     var val = JSON.parse(body);
     console.log("val"+val);
+    SearchActivityDictionary(val,queryFlag,query);
 
-    // check for type
-    if (val.hasOwnProperty('type')){
+    //check for 
+    if (val.hasOwnProperty('published') && val.hasOwnProperty('object') && val.hasOwnProperty('actor')){
+      console.log("SearchActivityStream:");
+      var value1 = val['published'];
+      var value2 = val['object'];
+      var value3 = val['actor'];
+      SearchActivityStream(val);
+
+    }else if (val.hasOwnProperty('type') && val.hasOwnProperty('object') && val.hasOwnProperty('actor') ){
+        // check for actor and object
+        console.log('Just Received a get request for type && object and actor');
+        ref.once("value").then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      // key will be "ada" the first time and "alan" the second time
+      var ID = childSnapshot.key;
+      console.log("============ ID");
+      console.log(ID);
+      console.log("============ ID");
+      // childData will be the actual contents of the child
+      var childData = childSnapshot.val();
+      console.log(childData);
+       var i = 0;
+      childSnapshot.forEach(function(childSnapshot2) {
+      // key will be "ada" the first time and "alan" the second time
+      i = i + 1;
+      console.log("counter: "+i);
+
+      var key = childSnapshot2.key;
+      var value = childSnapshot2.val();
+
+      // console.log("//============//");
+      // console.log(key);
+      // console.log(value);
+ //     console.log("//============//");
+      if (key === 'type' && value === val['type']){
+        console.log("****");
+        console.log(val['type']);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+       if (key === 'object' && value === val['object']){
+        console.log("****");
+        console.log(val['object']);
+        console.log("*****");
+        queryFlag = queryFlag + 1;
+
+      } 
+       if (key === 'actor' && value === val['actor']){
+        console.log("****");
+        console.log(val['actor']);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+      console.log("queryFlag");
+      console.log(queryFlag);
+      if (queryFlag === 3){
+          query.push(childData);
+          queryFlag = 0;
+          console.log(queryFlag);
+
+          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+      }
+
+      if(i === 6){
+        i = 0;
+        queryFlag = 0;
+
+      } 
+
+      // childData will be the actual contents of the child
+    //  var childData = childSnapshot.val();
+  });
+  });
+console.log("result====");
+console.log(query);
+});
+// print the result
+
+
+
+
+    }else if (val.hasOwnProperty('type')){ // check for type
       console.log("============= type");
 
       ref.orderByChild("type").equalTo(val.type).on("value", function(snapshot) {
@@ -157,7 +247,7 @@ const server = http.createServer((request, response) => {
     else if (val.hasOwnProperty('published')){
       console.log("============= published");
 
-      ref.orderByChild("published").equalTo(val.published).on("value", function(snapshot) {
+      ref.orderByChild("published").startAt(val.published).on("value", function(snapshot) {
 
       console.log(snapshot.key);
       var data = snapshot.val();   //Data is in JSON format.
@@ -198,7 +288,7 @@ const server = http.createServer((request, response) => {
     }
   //  var res = JSON.stringify(request.headers);
    // console.log(res);
-    console.log("============= request headers");
+    console.log("============= 200 running..");
    // console.log(request.headers);
     console.log("=============");
  //   response.writeHead( 200 );
@@ -245,4 +335,132 @@ const server = http.createServer((request, response) => {
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
+
+
+
+//MARK: - SearchActivityStream()
+
+function SearchActivityStream(val1,val2,val3){
+  console.log("SearchActivityStream: running..");
+  console.log("val1: "+val1);
+if (  !val3 || !val2 || !val3 ){
+  // 
+  console.log("you have an empty value");
+
+}else{
+// correct request
+console.log("SearchActivityStream: successful request!");
+}
+}
+
+//MARK: - SEARCH ACTIVITY STREAM BASED ON A DICTIONARY
+
+function SearchActivityDictionary(dict,queryFlag,query){
+
+  console.log("Running SearchActivityDictionary.. "+dict);
+  var count = Object.keys(dict).length;
+  console.log("dict length: "+count);
+  var numOfProperties = false;
+  var keys = [];
+  if (count === 3){
+      console.log("count: "+count);
+  var index = 0;
+  for (val in dict) {
+    console.log("value: "+dict[val]);
+    console.log("key: "+val);
+    console.log("===========/========");
+    keys[index] = val;
+    index++;
+  }
+console.log("keys: "+keys[0]);
+console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
+
+
+
+// get data from firebase
+        ref.once("value").then(function(snapshot) {
+    snapshot.forEach(function(childSnapshot) {
+      // key will be "ada" the first time and "alan" the second time
+      var ID = childSnapshot.key;
+      console.log("============ ID");
+      console.log(ID);
+      console.log("============ ID");
+      // childData will be the actual contents of the child
+      var childData = childSnapshot.val();
+      console.log(childData);
+       var i = 0;
+      childSnapshot.forEach(function(childSnapshot2) {
+      // key will be "ada" the first time and "alan" the second time
+      i = i + 1;
+      console.log("counter: "+i);
+
+      var key = childSnapshot2.key;
+      var value = childSnapshot2.val();
+
+      // console.log("//============//");
+      // console.log(key);
+      // console.log(value);
+ //     console.log("//============//");
+      if (key === keys[0] && value === dict[keys[0]]){
+        console.log("****");
+        console.log(keys[0]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+       if (key === keys[1] && value === dict[keys[1]]){
+        console.log("****");
+        console.log(keys[1]);
+        console.log("*****");
+        queryFlag = queryFlag + 1;
+
+      } 
+       if (key === keys[2] && value === dict[keys[2]]){
+        console.log("****");
+        console.log(dict[keys[2]]);
+        console.log("****");
+        queryFlag = queryFlag + 1;
+
+      }
+      console.log("queryFlag");
+      console.log(queryFlag);
+      if (queryFlag === 3){
+          query.push(childData);
+          queryFlag = 0;
+          console.log(queryFlag);
+
+          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+
+      }
+
+      if(i === 6){
+        i = 0;
+        queryFlag = 0;
+
+      } 
+
+      // childData will be the actual contents of the child
+    //  var childData = childSnapshot.val();
+  });
+  });
+console.log("result====");
+console.log(query);
+});
+
+
+
+
+}
+
+ //var dict2 =  Dictionary.set(dict);
+// dict2.forEach(function(key,value){
+//   console.log("key: "+key);
+//   console.log("value: "+ value);
+
+//   next();
+// });
+
+
+
+}
 
