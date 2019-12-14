@@ -110,12 +110,12 @@ def following(sender, instance, **kwargs):
         if user.is_anonymous:
             actor = None
         else:
-            actor =scheme_host+ reverse("userprofile",kwargs={"username":obj.following.username})
+            actor =scheme_host+ reverse("userprofile",kwargs={"username":user.username})
     else:
         actor = None
     object=scheme_host + "/" + str(obj.following.username)
     type = "follow"
-    summary = f"The User {user.username} has followed you'"
+    summary = f"{user.username} has followed you'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary":summary,

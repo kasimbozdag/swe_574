@@ -1489,24 +1489,33 @@ def unfollowuser(request, username):
 @login_required
 def news(request):
 	userprofile= UserProfile.objects.get(user=request.user)
-	following_q = userprofile.user.following.all()
+	following_q = userprofile.user.followed_by.all()
 	following = list()
 	for following_item in following_q:
 		following.append(following_item.user)
 
+	responses = list()
+	for usr in following:
+		responses.append(requests.get("http://127.0.0.1:3000/getAllActivities?actor=" + request._current_scheme_host + "/" + userprofile.user.username ))
+
+
+	print("following : ")
 	print(following)
 	json_datas = list()
-	response = requests.get("http://127.0.0.1:3000/getAllActivities?actor=" + request._current_scheme_host + "/" + userprofile.user.username + "/" )
-	res = response.json()
+	responses.append(requests.get("http://127.0.0.1:3000/getAllActivities?object=" + request._current_scheme_host + "/" + userprofile.user.username ))
+
+	#res = response.json()
 	print(request.user)
 	print("res : ")
-	print(res)
-	if res is not None:
-		for r in res:
-			print(res.get(r))
-	if res is not None:
-		for r in res:
-			json_datas.append(json.dumps(res.get(r)))
+	#print(res)
+	#if res is not None:
+#		for r in res:
+		#	print(res.get(r))
+	for res in responses:
+		res = res.json()
+		if res is not None:
+			for r in res:
+				json_datas.append(json.dumps(res.get(r)))
 
 	#print (response.json()['-Lv1p3L2E2pR7poBug3E'])
 	#json_datas.append(json_data)
