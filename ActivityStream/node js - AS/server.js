@@ -125,95 +125,106 @@ const server = http.createServer((request, response) => {
 
     body.push(jsonObj);
     console.log("body"+body);
+
     var val = JSON.parse(body);
     console.log("val"+val);
-    SearchActivityDictionary(val,queryFlag,query,response);
+    // SearchActivityDictionary for 2 values or more
+    var countVal = Object.keys(val).length;
+    console.log("countVal: "+countVal);
+
+    if (countVal > 1){
+       SearchActivityDictionary(val,queryFlag,query,response);
+    }
+
+   
 
     //check for 
-    if (val.hasOwnProperty('published') && val.hasOwnProperty('object') && val.hasOwnProperty('actor')){
-      console.log("SearchActivityStream:");
-      var value1 = val['published'];
-      var value2 = val['object'];
-      var value3 = val['actor'];
-      SearchActivityStream(val);
+//     if (val.hasOwnProperty('published') && val.hasOwnProperty('object') && val.hasOwnProperty('actor')){
+//       console.log("SearchActivityStream:");
+//       var value1 = val['published'];
+//       var value2 = val['object'];
+//       var value3 = val['actor'];
+//       SearchActivityStream(val);
 
-    }else if (val.hasOwnProperty('type') && val.hasOwnProperty('object') && val.hasOwnProperty('actor') ){
-        // check for actor and object
-        console.log('Just Received a get request for type && object and actor');
-        ref.once("value").then(function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
-      // key will be "ada" the first time and "alan" the second time
-      var ID = childSnapshot.key;
-      console.log("============ ID");
-      console.log(ID);
-      console.log("============ ID");
-      // childData will be the actual contents of the child
-      var childData = childSnapshot.val();
-      console.log(childData);
-       var i = 0;
-      childSnapshot.forEach(function(childSnapshot2) {
-      // key will be "ada" the first time and "alan" the second time
-      i = i + 1;
-      console.log("counter: "+i);
+//     }else if (val.hasOwnProperty('type') && val.hasOwnProperty('object') && val.hasOwnProperty('actor') ){
+//         // check for actor and object
+//         console.log('Just Received a get request for type && object and actor');
+//         ref.once("value").then(function(snapshot) {
+//     snapshot.forEach(function(childSnapshot) {
+//       // key will be "ada" the first time and "alan" the second time
+//       var ID = childSnapshot.key;
+//       console.log("============ ID");
+//       console.log(ID);
+//       console.log("============ ID");
+//       // childData will be the actual contents of the child
+//       var childData = childSnapshot.val();
+//       console.log(childData);
+//        var i = 0;
+//       childSnapshot.forEach(function(childSnapshot2) {
+//       // key will be "ada" the first time and "alan" the second time
+//       i = i + 1;
+//       console.log("counter: "+i);
 
-      var key = childSnapshot2.key;
-      var value = childSnapshot2.val();
+//       var key = childSnapshot2.key;
+//       var value = childSnapshot2.val();
 
-      // console.log("//============//");
-      // console.log(key);
-      // console.log(value);
- //     console.log("//============//");
-      if (key === 'type' && value === val['type']){
-        console.log("****");
-        console.log(val['type']);
-        console.log("****");
-        queryFlag = queryFlag + 1;
+//       // console.log("//============//");
+//       // console.log(key);
+//       // console.log(value);
+//  //     console.log("//============//");
+//       if (key === 'type' && value === val['type']){
+//         console.log("****");
+//         console.log(val['type']);
+//         console.log("****");
+//         queryFlag = queryFlag + 1;
 
-      }
-       if (key === 'object' && value === val['object']){
-        console.log("****");
-        console.log(val['object']);
-        console.log("*****");
-        queryFlag = queryFlag + 1;
+//       }
+//        if (key === 'object' && value === val['object']){
+//         console.log("****");
+//         console.log(val['object']);
+//         console.log("*****");
+//         queryFlag = queryFlag + 1;
 
-      } 
-       if (key === 'actor' && value === val['actor']){
-        console.log("****");
-        console.log(val['actor']);
-        console.log("****");
-        queryFlag = queryFlag + 1;
+//       } 
+//        if (key === 'actor' && value === val['actor']){
+//         console.log("****");
+//         console.log(val['actor']);
+//         console.log("****");
+//         queryFlag = queryFlag + 1;
 
-      }
-      console.log("queryFlag");
-      console.log(queryFlag);
-      if (queryFlag === 3){
-          query.push(childData);
-          queryFlag = 0;
-          console.log(queryFlag);
+//       }
+//       console.log("queryFlag");
+//       console.log(queryFlag);
+//       if (queryFlag === 3){
+//           query.push(childData);
+//           queryFlag = 0;
+//           console.log(queryFlag);
 
-          console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+//           console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
 
-      }
+//       }
 
-      if(i === 6){
-        i = 0;
-        queryFlag = 0;
+//       if(i === 6){
+//         i = 0;
+//         queryFlag = 0;
 
-      } 
+//       } 
 
-      // childData will be the actual contents of the child
-    //  var childData = childSnapshot.val();
-  });
-  });
-console.log("result====");
-console.log(query);
-});
+//       // childData will be the actual contents of the child
+//     //  var childData = childSnapshot.val();
+//   });
+//   });
+// console.log("result====");
+// console.log(query);
+// });
 // print the result
 
 
 
 
-    }else if (val.hasOwnProperty('type')){ // check for type
+    // }else 
+
+    else if (val.hasOwnProperty('type')){ // check for type
       console.log("============= type");
 
       ref.orderByChild("type").equalTo(val.type).on("value", function(snapshot) {
@@ -225,8 +236,28 @@ console.log(query);
     //  var rerturnedResponse = JSON.stringify(data);
 
      //ref.push(jsonObj);
-     response.end(res);
-     console.log("json: "+res);
+     try{
+      var dataVal = data;
+     // var dataCount = Object.keys(res).length;
+      console.log("dataCount: " + "DataVal"+dataVal)
+      if (dataVal != null){
+             response.end(res);
+             console.log("json 'type' : "+res);
+
+      }else{
+             var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+              // json output
+             console.log("Response data: "+rerturnedResponse);
+             response.end(rerturnedResponse);
+             console.log("json: "+res);
+
+      }
+
+     }catch(error){
+      console.log("Error 500:"+error );
+     }
+    // response.end(res);
+    // console.log("json: "+res);
 
 
     });
@@ -242,8 +273,29 @@ console.log(query);
     //  var rerturnedResponse = JSON.stringify(data);
 
      //ref.push(jsonObj);
-     response.end(res);
-     console.log("json: "+res);
+      try{
+
+      var dataVal = data;
+     // var dataCount = Object.keys(res).length;
+      console.log("dataCount: " + "DataVal"+dataVal)
+      if (dataVal != null){
+             response.end(res);
+             console.log("json 'object' : "+res);
+
+      }else{
+             var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+              // json output
+             console.log("Response data: "+rerturnedResponse);
+             response.end(rerturnedResponse);
+             console.log("json: "+res);
+
+      }
+
+     }catch(error){
+      console.log("Error 501:"+error );
+     }
+    // response.end(res);
+    // console.log("json: "+res);
 
 
     });
@@ -280,8 +332,30 @@ console.log(query);
     //  var rerturnedResponse = JSON.stringify(data);
 
      //ref.push(jsonObj);
-     response.end(res);
-     console.log("json: "+res)
+   //  response.end(res);
+   //  console.log("json: "+res)
+
+      try{
+        
+      var dataVal = data;
+     // var dataCount = Object.keys(res).length;
+      console.log("dataCount: " + "DataVal"+dataVal)
+      if (dataVal != null){
+             response.end(res);
+             console.log("json 'actor' : "+res);
+
+      }else{
+             var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
+              // json output
+             console.log("Response data: "+rerturnedResponse);
+             response.end(rerturnedResponse);
+             console.log("json: "+res);
+
+      }
+
+     }catch(error){
+      console.log("Error 501:"+error );
+     }
 
 });
 
@@ -385,8 +459,8 @@ console.log("the key: "+keys[0] +"is for value: "+dict[keys[0]]);
 
 
 // get data from firebase
-        ref.once("value").then(function(snapshot) {
-    snapshot.forEach(function(childSnapshot) {
+      ref.once("value").then(function(snapshot) {
+        snapshot.forEach(function(childSnapshot) {
       // key will be "ada" the first time and "alan" the second time
       var ID = childSnapshot.key;
       console.log("============ ID");
@@ -611,14 +685,10 @@ if (responseStatus > 0){
 
 });
 
-
-
-
-
-
-
+// for retrieving to values from database 
 }else if (count === 2){
-        console.log("count: "+count);
+  console.log("retrieving to values from database..");
+  console.log("count: "+count);
   var index = 0;
   for (val in dict) {
     console.log("value: "+dict[val]);
@@ -711,6 +781,7 @@ if (responseStatus > 0){
   console.log("empty result");
      var rerturnedResponse = JSON.stringify(errorMissingOrWrongEntry);
      // json output
+     console.log("Response data: "+rerturnedResponse);
      response.end(rerturnedResponse);
 //errorMissingOrWrongEntry
 //response.end(errorMissingOrWrongEntry);
@@ -728,13 +799,7 @@ if (responseStatus > 0){
 
 }
 
- //var dict2 =  Dictionary.set(dict);
-// dict2.forEach(function(key,value){
-//   console.log("key: "+key);
-//   console.log("value: "+ value);
 
-//   next();
-// });
 
 
 
