@@ -11,7 +11,7 @@ import requests
 activityHost = "http://activity_stream:3000/echo"
 
 
-# activityHost = "http://127.0.0.1:3000/echo"
+#activityHost = "http://127.0.0.1:3000/echo"
 
 
 # this is a signal that will trigger when a Topic instance is saved to db
@@ -74,24 +74,16 @@ def course_post_enrolled_finished(sender, instance, created, **kwargs):
             actor = scheme_host + reverse("userprofile", kwargs={"username": user.username})
     else:
         actor = None
-    if obj.isFinished == False and obj.completeRate <= 0:
+    if obj.isFinished == False and obj.completeRate <= 0 and created:
         object = scheme_host + "/exploretopic/" + str(obj.id)
         type = "enroll"
         summary = f"The User {user.username} enrolled in the course '{obj.course.title}'"
-        activity = {
-            "@context": "https://www.w3.org/ns/activitystreams",
-            "summary": summary,
-            "type": type,
-            "actor": actor,
-            "object": object,
-            "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
-        }
-        req = requests.post("http://activity_stream:3000/echo", json=activity)
 
-    if obj.isFinished == True and obj.completeRate >= 100:
-        object = scheme_host + "/exploretopic/" + str(obj.id)
-        type = "completed"
-        summary = f"The User {user.username} completed the course '{obj.course.title}'"
+
+    #if obj.isFinished == True and obj.completeRate >= 100:
+    #    object = scheme_host + "/exploretopic/" + str(obj.id)
+    #    type = "completed"
+    #    summary = f"The User {user.username} completed the course '{obj.course.title}'"
         activity = {
             "@context": "https://www.w3.org/ns/activitystreams",
             "summary": summary,

@@ -1542,6 +1542,8 @@ def unfollowuser(request, username):
     userfollowing.delete()
     return redirect('userprofile', username=following.username)
 
+activityHost = "http://activity_stream:3000/"
+#activityHost = "http://127.0.0.1:3000/"
 
 @login_required
 def news(request):
@@ -1553,13 +1555,13 @@ def news(request):
 
     print("current")
     for usr in following_q:
-        r = requests.get("http://activity_stream:3000/getAllActivities?actor=" + request._current_scheme_host + "/" + usr.following.username+"/")
+        r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + usr.following.username+"/")
         responses.append(r)
 
     print("following : ")
     json_datas = list()
 
-    r = requests.get("http://activity_stream:3000/getAllActivities?object=" + request._current_scheme_host + "/" + request.user.username)
+    r = requests.get(activityHost + "getAllActivities?object=" + request._current_scheme_host + "/" + request.user.username)
     responses.append(r)
 
     # res = response.json()
