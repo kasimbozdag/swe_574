@@ -683,9 +683,10 @@ def newglossary(request, course_id, wiki_id):
     r_json = json.loads(r_json)
 
     for entity in r_json:
-        glossary.name = entity['label']
-        glossary.description = entity['description']
-        glossary.url = "https:" + entity['url']
+        glossary.name = entity.get("label", "")
+        glossary.description = entity.get("description", "")
+        glossary.url = "https:" + entity.get("url", "")
+        glossary.identifier = wiki_id
 
     try:
         URL = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={}&format=json".format(wiki_id)

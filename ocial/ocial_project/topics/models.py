@@ -50,6 +50,7 @@ class Learner_Course_Record(models.Model):
         return self.learner.user.username + " - " +self.course.title
 
 class Glossary(models.Model):
+	identifier=models.CharField(max_length=32,default="")
 	name = models.CharField(max_length=200)
 	image_url = models.CharField(max_length=1000, blank=True)
 	description = models.TextField(blank=True)
