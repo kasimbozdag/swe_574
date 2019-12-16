@@ -11,14 +11,16 @@ class Recommendation(View):
         courses = Learner_Course_Record.objects.filter(learner__user=request.user)
 
         taken_courses = [course.course.id for course in courses]
-        print(taken_courses)
-        labels = [label.id for course in courses for label in course.course.label.all()]
+
+        labels = [label.identifier for course in courses for label in course.course.glossary_set.all()]
+
         from collections import Counter
 
         labels_count = Counter(labels)
+
         rec = {}
         for label in labels_count:
-            c = Course.objects.filter(label__id=label).exclude(id__in=taken_courses).exclude(teacher=request.user)
+            c = Course.objects.filter(glossary__identifier=label).exclude(id__in=taken_courses).exclude(teacher=request.user)
             for course in c:
                 if course.id in rec:
                     rec[course.id] += labels_count[label]
