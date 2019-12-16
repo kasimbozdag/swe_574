@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
@@ -15,7 +14,7 @@ from django.core.files.base import ContentFile
 from .decorators import *
 from django.contrib.auth.hashers import check_password
 from django.core import serializers
-import urllib.request 
+import urllib.request
 import ssl
 from functools import reduce
 from django.db.models import Q
@@ -23,1553 +22,1546 @@ from operator import or_
 
 
 def home(request):
-	topics = Topic.objects.filter(course__published=True).annotate(number_of_courses=Count('course'))
-	topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
-	topics = topics[:9]
-	return render(request, 'topics/home.html', {'topics': topics })
-
-def userprofile(request,username):
-	user =  get_object_or_404(User,username=username)
-
-	userprofile, created = UserProfile.objects.get_or_create(user=user)
-	userprofile.save()
-	courses = Course.objects.filter(teacher = user,published=True)
-
-	followed_by_q = userprofile.user.followed_by.all()
-	following_q = userprofile.user.following.all()
-
-	requester = request.user
-
-	followed_by = list()
-	following = list()
-
-	for followedby_item in followed_by_q:
-		followed_by.append(followedby_item.user)
-
-	for following_item in following_q:
-		following.append(following_item.user)
+    topics = Topic.objects.filter(course__published=True).annotate(number_of_courses=Count('course'))
+    topics = sorted(topics, key=operator.attrgetter('number_of_courses'), reverse=True)
+    topics = topics[:9]
+    return render(request, 'topics/home.html', {'topics': topics})
 
 
-	try:
-		learner =  Learner.objects.get(user=user)
-		enrolled_courses = Learner_Course_Record.objects.filter(learner = learner)
-	except:
-		enrolled_courses = None
+def userprofile(request, username):
+    user = get_object_or_404(User, username=username)
 
-	return render(request, 'topics/userprofile.html', {'userprofile': userprofile , 'enrolled_courses':enrolled_courses,'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
+    userprofile, created = UserProfile.objects.get_or_create(user=user)
+    userprofile.save()
+    courses = Course.objects.filter(teacher=user, published=True)
 
-def userfollowers(request,username):
-	user =  get_object_or_404(User,username=username)
-	userprofile, created = UserProfile.objects.get_or_create(user=user)
-	userprofile.save()
-	courses = Course.objects.filter(teacher = user,published=True)
+    followed_by_q = userprofile.user.followed_by.all()
+    following_q = userprofile.user.following.all()
 
-	followed_by_q = userprofile.user.followed_by.all()
-	following_q = userprofile.user.following.all()
+    requester = request.user
 
-	requester = request.user
+    followed_by = list()
+    following = list()
 
-	followed_by = list()
-	following = list()
-	followed_by_userprofile = list()
+    for followedby_item in followed_by_q:
+        followed_by.append(followedby_item.user)
 
-	for followedby_item in followed_by_q:
-		followed_by.append(followedby_item.user)
+    for following_item in following_q:
+        following.append(following_item.user)
 
-	for following_item in following_q:
-		following.append(following_item.user)
+    try:
+        learner = Learner.objects.get(user=user)
+        enrolled_courses = Learner_Course_Record.objects.filter(learner=learner)
+    except:
+        enrolled_courses = None
 
-
-	for userprofile_item in followed_by:
-		userprofile_object = UserProfile.objects.get(user = userprofile_item)
-		followed_by_userprofile.append(userprofile_object)
-
-	return render(request, 'topics/userfollowers.html', {'userprofile': userprofile ,'followed_by_userprofile':followed_by_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
-
-def userfollowing(request,username):
-	user =  get_object_or_404(User,username=username)
-	userprofile, created = UserProfile.objects.get_or_create(user=user)
-	userprofile.save()
-	courses = Course.objects.filter(teacher = user,published=True)
-
-	followed_by_q = userprofile.user.followed_by.all()
-	following_q = userprofile.user.following.all()
-
-	requester = request.user
-
-	followed_by = list()
-	following = list()
-	following_userprofile = list()
-
-	for followedby_item in followed_by_q:
-		followed_by.append(followedby_item.user)
-
-	for following_item in following_q:
-		following.append(following_item.following)
+    return render(request, 'topics/userprofile.html',
+                  {'userprofile': userprofile, 'enrolled_courses': enrolled_courses, 'followed_by': followed_by, 'following': following, 'courses': courses,
+                   'requester': requester})
 
 
-	for userprofile_item in following:
-		userprofile_object = UserProfile.objects.get(user = userprofile_item)
-		following_userprofile.append(userprofile_object)
+def userfollowers(request, username):
+    user = get_object_or_404(User, username=username)
+    userprofile, created = UserProfile.objects.get_or_create(user=user)
+    userprofile.save()
+    courses = Course.objects.filter(teacher=user, published=True)
 
-	
+    followed_by_q = userprofile.user.followed_by.all()
+    following_q = userprofile.user.following.all()
 
-	return render(request, 'topics/userfollowing.html', {'userprofile': userprofile ,'following_userprofile':following_userprofile, 'followed_by': followed_by, 'following':following, 'courses':courses, 'requester': requester })
+    requester = request.user
 
+    followed_by = list()
+    following = list()
+    followed_by_userprofile = list()
+
+    for followedby_item in followed_by_q:
+        followed_by.append(followedby_item.user)
+
+    for following_item in following_q:
+        following.append(following_item.user)
+
+    for userprofile_item in followed_by:
+        userprofile_object = UserProfile.objects.get(user=userprofile_item)
+        followed_by_userprofile.append(userprofile_object)
+
+    return render(request, 'topics/userfollowers.html',
+                  {'userprofile': userprofile, 'followed_by_userprofile': followed_by_userprofile, 'followed_by': followed_by, 'following': following,
+                   'courses': courses, 'requester': requester})
+
+
+def userfollowing(request, username):
+    user = get_object_or_404(User, username=username)
+    userprofile, created = UserProfile.objects.get_or_create(user=user)
+    userprofile.save()
+    courses = Course.objects.filter(teacher=user, published=True)
+
+    followed_by_q = userprofile.user.followed_by.all()
+    following_q = userprofile.user.following.all()
+
+    requester = request.user
+
+    followed_by = list()
+    following = list()
+    following_userprofile = list()
+
+    for followedby_item in followed_by_q:
+        followed_by.append(followedby_item.user)
+
+    for following_item in following_q:
+        following.append(following_item.following)
+
+    for userprofile_item in following:
+        userprofile_object = UserProfile.objects.get(user=userprofile_item)
+        following_userprofile.append(userprofile_object)
+
+    return render(request, 'topics/userfollowing.html',
+                  {'userprofile': userprofile, 'following_userprofile': following_userprofile, 'followed_by': followed_by, 'following': following,
+                   'courses': courses, 'requester': requester})
 
 
 def topics(request):
-	if request.method == 'GET': # If the form is submitted
-		search_query = request.GET.get('search_topic', None)
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_topic', None)
 
-		ssl._create_default_https_context = ssl._create_unverified_context
+        ssl._create_default_https_context = ssl._create_unverified_context
 
-		search_list = list()
-		search_list.append(search_query)
+        search_list = list()
+        search_list.append(search_query)
 
+        if search_query != None:
 
-		if search_query != None:
+            url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+        if search_query != None:
+            query = Q()
+            for item in search_list:
+                query |= Q(title__icontains=item)
+            topics = Topic.objects.filter(query).annotate(number_of_courses=Count('course'))
+        else:
+            topics = Topic.objects.annotate(number_of_courses=Count('course'))
+            topics = sorted(topics, key=operator.attrgetter('number_of_courses'), reverse=True)
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+        return render(request, 'topics/topics.html', {'topics': topics})
 
-
-		if search_query != None:
-			query = Q()
-			for item in search_list:
-				query |= Q(title__icontains=item)
-			topics = Topic.objects.filter(query).annotate(number_of_courses=Count('course'))
-		else:
-			topics = Topic.objects.annotate(number_of_courses=Count('course'))
-			topics = sorted(topics, key=operator.attrgetter('number_of_courses'),reverse=True)
-
-		return render(request, 'topics/topics.html', {'topics': topics})
 
 def explore(request):
-	if request.method == 'GET': # If the form is submitted
-		search_query = request.GET.get('search_course', None)
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_course', None)
 
-		ssl._create_default_https_context = ssl._create_unverified_context
+        ssl._create_default_https_context = ssl._create_unverified_context
 
-		search_list = list()
-		search_list.append(search_query)
+        search_list = list()
+        search_list.append(search_query)
 
+        if search_query != None:
 
-		if search_query != None:
+            url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
+            url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=5"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+        print(search_list)
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+        if search_query != None:
+            query = Q()
+            for item in search_list:
+                query |= Q(title__icontains=item)
+                query |= Q(topic__title__icontains=item)
+                query |= Q(description__icontains=item)
+                query |= Q(wywl__icontains=item)
 
-		print(search_list)
-
-
-
-		if search_query != None:
-			query = Q()
-			for item in search_list:
-				query |= Q(title__icontains=item)
-				query |= Q(topic__title__icontains=item)
-				query |= Q(description__icontains=item)
-				query |= Q(wywl__icontains=item)
-
-			courses = Course.objects.filter(query, published=True)
-		else:
-			courses = Course.objects.filter(published=True)
-			#courses = sorted(courses,reverse=True)
-		return render(request, 'topics/explore.html', {'courses': courses})
-
-def exploretopic(request,topic_id):
-	topic =  get_object_or_404(Topic,pk=topic_id)
-
-	if request.method == 'GET': # If the form is submitted
-		search_query = request.GET.get('search_course', None)
-
-		ssl._create_default_https_context = ssl._create_unverified_context
-
-		search_list = list()
-		search_list.append(search_query)
+            courses = Course.objects.filter(query, published=True)
+        else:
+            courses = Course.objects.filter(published=True)
+        # courses = sorted(courses,reverse=True)
+        return render(request, 'topics/explore.html', {'courses': courses})
 
 
-		if search_query != None:
+def exploretopic(request, topic_id):
+    topic = get_object_or_404(Topic, pk=topic_id)
 
-			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_course', None)
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+        ssl._create_default_https_context = ssl._create_unverified_context
 
+        search_list = list()
+        search_list.append(search_query)
 
-			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
+        if search_query != None:
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+            url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
-		if search_query != None:
-			query = Q()
-			for item in search_list:
-				query |= Q(title__icontains=item)
-				query |= Q(topic__title__icontains=item)
-				query |= Q(description__icontains=item)
-				query |= Q(wywl__icontains=item)
+            url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
 
-			courses = Course.objects.filter(query,topic= topic_id, published=True)
-		else:
-			courses = Course.objects.filter(topic= topic_id,published=True)
-			#courses = sorted(courses,reverse=True)
-		return render(request, 'topics/explore.html', {'courses': courses,'topic': topic})
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
 
+        if search_query != None:
+            query = Q()
+            for item in search_list:
+                query |= Q(title__icontains=item)
+                query |= Q(topic__title__icontains=item)
+                query |= Q(description__icontains=item)
+                query |= Q(wywl__icontains=item)
 
-def explorelabel(request,label_id):
-	label =  get_object_or_404(Label,pk=label_id)
-
-	if request.method == 'GET': # If the form is submitted
-		search_query = request.GET.get('search_label', None)
-		ssl._create_default_https_context = ssl._create_unverified_context
-
-		search_list = list()
-		search_list.append(search_query)
+            courses = Course.objects.filter(query, topic=topic_id, published=True)
+        else:
+            courses = Course.objects.filter(topic=topic_id, published=True)
+        # courses = sorted(courses,reverse=True)
+        return render(request, 'topics/explore.html', {'courses': courses, 'topic': topic})
 
 
-		if search_query != None:
+def explorelabel(request, label_id):
+    label = get_object_or_404(Label, pk=label_id)
 
-			url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_label', None)
+        ssl._create_default_https_context = ssl._create_unverified_context
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+        search_list = list()
+        search_list.append(search_query)
+
+        if search_query != None:
+
+            url = "https://api.datamuse.com/words?ml=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
+
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
+
+            url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
+
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
+
+            url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
+            with urllib.request.urlopen(url) as url:
+                data = json.loads(url.read().decode())
+
+            for i in range(0, len(data)):
+                search_list.append(data[i]['word'])
+
+        if search_query != None:
+            query = Q()
+            for item in search_list:
+                query |= Q(title__icontains=item)
+                query |= Q(topic__title__icontains=item)
+                query |= Q(description__icontains=item)
+                query |= Q(wywl__icontains=item)
+            courses = Course.objects.filter(query, label=label_id, published=True)
+        else:
+            courses = Course.objects.filter(label=label_id, published=True)
+        # courses = sorted(courses,reverse=True)
+        return render(request, 'topics/explore.html', {'courses': courses, 'label': label})
 
 
-			url = "https://api.datamuse.com/words?rel_trg=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
+def exploreteacher(request, id):
+    teacher = get_object_or_404(User, pk=id)
 
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
+    if request.method == 'GET':  # If the form is submitted
+        search_query = request.GET.get('search_course', None)
 
-			url = "https://api.datamuse.com/words?sp=" + search_query.replace(" ", "+") + "&max=15"
-			with urllib.request.urlopen(url) as url:
-				data = json.loads(url.read().decode())
-				
-
-			for i in range(0,len(data)):
-				search_list.append(data[i]['word'])
-
-		if search_query != None:
-			query = Q()
-			for item in search_list:
-				query |= Q(title__icontains=item)
-				query |= Q(topic__title__icontains=item)
-				query |= Q(description__icontains=item)
-				query |= Q(wywl__icontains=item)
-			courses = Course.objects.filter(query,label= label_id, published=True)
-		else:
-			courses = Course.objects.filter(label= label_id,published=True)
-			#courses = sorted(courses,reverse=True)
-		return render(request, 'topics/explore.html', {'courses': courses,'label': label})
-
-def exploreteacher(request,id):
-	teacher =  get_object_or_404(User,pk=id)
-
-	if request.method == 'GET': # If the form is submitted
-		search_query = request.GET.get('search_course', None)
-
-		if search_query != None:
-			courses = Course.objects.filter(teacher= id,title__icontains=search_query, published=True)
-		else:
-			courses = Course.objects.filter(teacher= id,published=True)
-			#courses = sorted(courses,reverse=True)
-		return render(request, 'topics/explore.html', {'courses': courses,'teacher': teacher})
-
+        if search_query != None:
+            courses = Course.objects.filter(teacher=id, title__icontains=search_query, published=True)
+        else:
+            courses = Course.objects.filter(teacher=id, published=True)
+        # courses = sorted(courses,reverse=True)
+        return render(request, 'topics/explore.html', {'courses': courses, 'teacher': teacher})
 
 
 def coursedetail(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learners_query = list(Learner_Course_Record.objects.filter(course = course_id))
-	learners = list()
+    course = get_object_or_404(Course, pk=course_id, published=True)
+    learners_query = list(Learner_Course_Record.objects.filter(course=course_id))
+    learners = list()
 
-	for learner in learners_query:
-		learners.append(learner.learner.user.username)
-	return render(request, 'topics/course_detail.html', {'learners':learners,'course': course})
-
+    for learner in learners_query:
+        learners.append(learner.learner.user.username)
+    return render(request, 'topics/course_detail.html', {'learners': learners, 'course': course})
 
 
 @login_required
 def classroom(request):
-	courses = Course.objects.filter(teacher=request.user, published = True)
+    courses = Course.objects.filter(teacher=request.user, published=True)
 
-	for course in courses:
-		course_complete = 0
-		numberof_learners = 0
-		lcrs = Learner_Course_Record.objects.filter(course=course)
-		if lcrs:
-			for lcr in lcrs:
-				course_complete += lcr.completeRate/len(lcrs)
-				numberof_learners += 1
-		course.completeRate = course_complete
-		course.numberofLearners = numberof_learners
-		course.save()
+    for course in courses:
+        course_complete = 0
+        numberof_learners = 0
+        lcrs = Learner_Course_Record.objects.filter(course=course)
+        if lcrs:
+            for lcr in lcrs:
+                course_complete += lcr.completeRate / len(lcrs)
+                numberof_learners += 1
+        course.completeRate = course_complete
+        course.numberofLearners = numberof_learners
+        course.save()
 
-	return render(request, 'topics/classroom.html',{'courses': courses })
+    return render(request, 'topics/classroom.html', {'courses': courses})
+
 
 @login_required
 @course_teacher_is_user
 def coursestatistics(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	sections = Section.objects.filter(course = course)
+    course = get_object_or_404(Course, pk=course_id)
+    sections = Section.objects.filter(course=course)
 
-	for section in sections:
-		section_complete = 0
-		lsrs = Learner_Section_Record.objects.filter(section=section)
-		if lsrs:
-			for lsr in lsrs:
-				section_complete += lsr.completeRate/len(lsrs)
-		section.completeRate = section_complete
-		section.save()
+    for section in sections:
+        section_complete = 0
+        lsrs = Learner_Section_Record.objects.filter(section=section)
+        if lsrs:
+            for lsr in lsrs:
+                section_complete += lsr.completeRate / len(lsrs)
+        section.completeRate = section_complete
+        section.save()
 
-	return render(request, 'topics/coursestatistics.html', {'sections':sections})
+    return render(request, 'topics/coursestatistics.html', {'sections': sections})
+
 
 @login_required
 @section_teacher_is_user
 def sectionstatistics(request, section_id):
-	section =  get_object_or_404(Section,pk=section_id)
-	learningpath = createlearningpath(section.id)
+    section = get_object_or_404(Section, pk=section_id)
+    learningpath = createlearningpath(section.id)
 
-	for item in learningpath:
-		item_complete = 0
-		if isinstance(item, Lecture):
-			llrs = Learner_Lecture_Record.objects.filter(lecture=item)
-			if llrs:
-				for llr in llrs:
-					if llr.isFinished == True:
-						item_complete += 1/len(llrs)*100
-			item.completeRate = item_complete
-			item.save()
-		elif isinstance(item, Quiz):
-			lqrs = Learner_Quiz_Record.objects.filter(quiz=item)
-			if lqrs:
-				for lqr in lqrs:
-					if lqr.isFinished == True:
-						item_complete += 1/len(lqrs)*100
-			item.completeRate = item_complete
-			item.save()
+    for item in learningpath:
+        item_complete = 0
+        if isinstance(item, Lecture):
+            llrs = Learner_Lecture_Record.objects.filter(lecture=item)
+            if llrs:
+                for llr in llrs:
+                    if llr.isFinished == True:
+                        item_complete += 1 / len(llrs) * 100
+            item.completeRate = item_complete
+            item.save()
+        elif isinstance(item, Quiz):
+            lqrs = Learner_Quiz_Record.objects.filter(quiz=item)
+            if lqrs:
+                for lqr in lqrs:
+                    if lqr.isFinished == True:
+                        item_complete += 1 / len(lqrs) * 100
+            item.completeRate = item_complete
+            item.save()
 
-	learningpath = createlearningpath(section.id)
+    learningpath = createlearningpath(section.id)
 
-	return render(request, 'topics/sectionstatistics.html', {'learningpath':learningpath})
+    return render(request, 'topics/sectionstatistics.html', {'learningpath': learningpath})
 
-def saveprofile(request,profile_owner):
-	print(request.POST)
-	profile_owner.user.username = request.POST['username']
-	profile_owner.user.first_name = request.POST['firstname']
-	profile_owner.user.last_name = request.POST['lastname']
-	profile_owner.user.email = request.POST['email']
-	profile_owner.user.save()
-	if request.FILES.get('profile_image', False):
-		profile_owner.image = request.FILES['profile_image']
-	profile_owner.save()
+
+def saveprofile(request, profile_owner):
+    print(request.POST)
+    profile_owner.user.username = request.POST['username']
+    profile_owner.user.first_name = request.POST['firstname']
+    profile_owner.user.last_name = request.POST['lastname']
+    profile_owner.user.email = request.POST['email']
+    profile_owner.user.save()
+    if request.FILES.get('profile_image', False):
+        profile_owner.image = request.FILES['profile_image']
+    profile_owner.save()
 
 
 @login_required
 def editprofile(request):
-	profile_owner = UserProfile.objects.get(user = request.user)
+    profile_owner = UserProfile.objects.get(user=request.user)
 
+    if request.method == 'POST':
 
-	if request.method == 'POST':
+        if request.POST['username'] and request.POST['email']:
+            try:
+                username_check = User.objects.get(username=request.POST['username'])
+                useremail_check = User.objects.get(email=request.POST['email'])
+                if username_check != profile_owner.user:
+                    return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner, 'error': 'Username has already been taken'})
+                elif useremail_check != profile_owner.user:
+                    return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner, 'error': 'E-Mail is used by other user.'})
+                else:
+                    saveprofile(request, profile_owner)
+                    return redirect('userprofile', username=profile_owner.user.username)
+            except:
+                saveprofile(request, profile_owner)
+                return redirect('userprofile', username=profile_owner.user.username)
+        else:
+            return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner, 'error': 'Username or E-Mail cannot be empty.'})
+    else:
+        return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner})
 
-		if request.POST['username'] and request.POST['email']:
-			try:
-				username_check = User.objects.get(username = request.POST['username'])
-				useremail_check = User.objects.get(email = request.POST['email'])
-				if username_check != profile_owner.user:
-					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username has already been taken'})
-				elif useremail_check != profile_owner.user:
-					return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'E-Mail is used by other user.'})
-				else:
-					saveprofile(request,profile_owner)
-					return redirect('userprofile', username=profile_owner.user.username)
-			except:
-				saveprofile(request,profile_owner)
-				return redirect('userprofile', username=profile_owner.user.username)
-		else:
-			return render(request, 'topics/editprofile.html', {'profile_owner': profile_owner,'error': 'Username or E-Mail cannot be empty.'})
-	else:
-		return render(request, 'topics/editprofile.html',{'profile_owner': profile_owner})
 
 @login_required
 def changepassword(request):
-	profile_owner = request.user
-	currentpassword= request.user.password
+    profile_owner = request.user
+    currentpassword = request.user.password
 
-	if request.method == 'POST':
-		if request.POST['oldpassword'] and request.POST['password'] and request.POST['password2']:
-			currentpasswordentered = request.POST['oldpassword']
-			matchcheck= check_password(currentpasswordentered, currentpassword)
-			if matchcheck:
-				if request.POST['password'] == request.POST['password2']:
-					profile_owner.set_password(request.POST['password'])
-					profile_owner.save()
-					return redirect('userprofile', username=profile_owner.username)
-				else:
-					return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'New password is not confirmed.'})
-			else:
-				return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'Old password is wrong.'})
-		else:
-			return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner, 'error': 'All fields are required.'})
+    if request.method == 'POST':
+        if request.POST['oldpassword'] and request.POST['password'] and request.POST['password2']:
+            currentpasswordentered = request.POST['oldpassword']
+            matchcheck = check_password(currentpasswordentered, currentpassword)
+            if matchcheck:
+                if request.POST['password'] == request.POST['password2']:
+                    profile_owner.set_password(request.POST['password'])
+                    profile_owner.save()
+                    return redirect('userprofile', username=profile_owner.username)
+                else:
+                    return render(request, 'topics/changepassword.html', {'profile_owner': profile_owner, 'error': 'New password is not confirmed.'})
+            else:
+                return render(request, 'topics/changepassword.html', {'profile_owner': profile_owner, 'error': 'Old password is wrong.'})
+        else:
+            return render(request, 'topics/changepassword.html', {'profile_owner': profile_owner, 'error': 'All fields are required.'})
 
-	return render(request, 'topics/changepassword.html',{'profile_owner': profile_owner})
+    return render(request, 'topics/changepassword.html', {'profile_owner': profile_owner})
 
 
 @login_required
 def teacher(request):
-	teacher = request.user
-	courses = Course.objects.filter(teacher=teacher)
-	return render(request, 'topics/teacher.html',{'courses': courses , 'teacher': teacher})
+    teacher = request.user
+    courses = Course.objects.filter(teacher=teacher)
+    return render(request, 'topics/teacher.html', {'courses': courses, 'teacher': teacher})
+
 
 def newcourse(request):
-	topics = Topic.objects.all()
+    topics = Topic.objects.all()
 
-	if request.method == 'POST':
-		if request.POST['newtopic']:
-			try:
-				topic = Topic.objects.get(title__iexact=request.POST['newtopic'])
-			except:
-				topic = Topic()
-				topic.title = request.POST['newtopic']
-				topic.save()			
-			course = Course()
-			course.topic = topic
-			savecourse(request,course)
-			return redirect('editcourse', course_id=course.id)
-			print(request.POST['newtopic'])
-			return redirect('teacher')
-		elif 'close' in request.POST:
-			return redirect('teacher')
-		elif request.POST['topic']:
-			course = Course()
-			savecourse(request,course)
-			return redirect('editcourse', course_id=course.id)
-	else:
-		return render(request, 'topics/newcourse.html',{'topics':topics})
+    if request.method == 'POST':
+        if request.POST['newtopic']:
+            try:
+                topic = Topic.objects.get(title__iexact=request.POST['newtopic'])
+            except:
+                topic = Topic()
+                topic.title = request.POST['newtopic']
+                topic.save()
+            course = Course()
+            course.topic = topic
+            savecourse(request, course)
+            return redirect('editcourse', course_id=course.id)
+            print(request.POST['newtopic'])
+            return redirect('teacher')
+        elif 'close' in request.POST:
+            return redirect('teacher')
+        elif request.POST['topic']:
+            course = Course()
+            savecourse(request, course)
+            return redirect('editcourse', course_id=course.id)
+    else:
+        return render(request, 'topics/newcourse.html', {'topics': topics})
 
 
 @login_required
 def newcourse_old(request):
-	topics = Topic.objects.all()
-	teacher = request.user
+    topics = Topic.objects.all()
+    teacher = request.user
 
-	if request.method == 'POST':
-		if 'newtopic' in request.POST:
-			try:
-				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
-			except:
-				topic = Topic()
-				topic.title = request.POST['topictitle']
-				topic.save()
-				if request.POST['title']:
-					course = Course()
-					course.title = request.POST['title']
-					course.description = request.POST['description']
-					course.wywl = request.POST['wywl']
-					course.pubdate = timezone.datetime.now()
-					course.teacher = request.user
-					course.topic = topic
+    if request.method == 'POST':
+        if 'newtopic' in request.POST:
+            try:
+                topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
+            except:
+                topic = Topic()
+                topic.title = request.POST['topictitle']
+                topic.save()
+                if request.POST['title']:
+                    course = Course()
+                    course.title = request.POST['title']
+                    course.description = request.POST['description']
+                    course.wywl = request.POST['wywl']
+                    course.pubdate = timezone.datetime.now()
+                    course.teacher = request.user
+                    course.topic = topic
 
-					if request.FILES.get('image', False):
-						course.image = request.FILES['image']
+                    if request.FILES.get('image', False):
+                        course.image = request.FILES['image']
 
-					course.save()
-					return redirect('editcourse', course_id=course.id)
-			return redirect('newcourse')
-		if 'save' in request.POST:
-			if request.POST['title'] and request.POST.get('topic'):
-				course = Course()
-				savecourse(request,course)
-				return redirect('editcourse', course_id=course.id)
-			else:
-				return render(request, 'topics/newcourse.html', {'topics': topics , 'error': 'Title and Topic fields are required'})
-	else:
-		return render(request, 'topics/newcourse.html',{'teacher':teacher, 'topics': topics})
+                    course.save()
+                    return redirect('editcourse', course_id=course.id)
+            return redirect('newcourse')
+        if 'save' in request.POST:
+            if request.POST['title'] and request.POST.get('topic'):
+                course = Course()
+                savecourse(request, course)
+                return redirect('editcourse', course_id=course.id)
+            else:
+                return render(request, 'topics/newcourse.html', {'topics': topics, 'error': 'Title and Topic fields are required'})
+    else:
+        return render(request, 'topics/newcourse.html', {'teacher': teacher, 'topics': topics})
+
 
 @login_required
 @course_teacher_is_user
-def editcourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	topics = Topic.objects.all()
-	teacher = course.teacher
+def editcourse(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    topics = Topic.objects.all()
+    teacher = course.teacher
 
-	if course.section_set.all():
-		for section in course.section_set.all():
-			if section.isPublishable == True:
-				course.isPublishable = True
-			else:
-				course.isPublishable = False
-				break
-	course.save()
+    if course.section_set.all():
+        for section in course.section_set.all():
+            if section.isPublishable == True:
+                course.isPublishable = True
+            else:
+                course.isPublishable = False
+                break
+    course.save()
 
-	if request.method == 'POST':
-		if 'addglossary' in request.POST:
-			return redirect('glossary', course_id=course.id)
-		elif 'newsection' in request.POST:
-			if request.POST['sectionname']:
-				numberofsections = course.section_set.count()
-				section = Section()
-				section.name = request.POST['sectionname']
-				section.course = course
-				section.order = numberofsections +1
-				section.save()
-				return redirect('editsection', section_id=section.id)
-		elif 'newtopic' in request.POST:
-			try:
-				topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
-			except:
-				topic = Topic()
-				topic.title = request.POST['topictitle']
-				topic.save()
-			savecourse(request,course)
-			course.topic  = topic
-			course.save()
-			return redirect('editcourse', course_id=course.id)
-		elif 'save' in request.POST:
-			if request.POST['title'] and request.POST.getlist('topic'):
-				savecourse(request,course)
-				return redirect('editcourse', course_id=course.id)
-			else:
-				return render(request, 'topics/editcourse.html', {'teacher':teacher,'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		elif 'save_exit' in request.POST:
-			if request.POST['title'] and request.POST.getlist('topic'):
-				savecourse(request,course)
-				return redirect('teacher')
-			else:
-				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		elif 'publish' in request.POST:
-			if request.POST['title'] and request.POST.getlist('topic'):
-				savecourse(request,course)
-				if course.isPublishable == True:
-					course.published = True
-					course.save()
-					return redirect('teacher')
-				else:
-					course.published = False
-					course.save()
-					return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'One of the sections is not submitted.'})
-			else:
-				return render(request, 'topics/editcourse.html', {'topics': topics , 'course': course, 'error': 'Title and Topic fields are required'})
-		return render(request, 'topics/editcourse.html',{'teacher':teacher,'topics': topics ,'course': course},)
-	else:
-		return render(request, 'topics/editcourse.html',{'teacher':teacher,'topics': topics ,'course': course},)
-
-def savecourse(request,course):
-	if 'section-order' in request.POST:
-		ordersection(request)
-
-	course.title = request.POST['title']
-	print(request.POST)
-	if 'description' in request.POST:
-		course.description = request.POST['description']
-		course.wywl = request.POST['wywl']
-	course.pubdate = timezone.datetime.now()
-	course.teacher = request.user
-
-	if 'topic' in request.POST:
-		topic_title = request.POST.get('topic')
-		course.topic  = Topic.objects.get(id=topic_title)
+    if request.method == 'POST':
+        if 'addglossary' in request.POST:
+            return redirect('glossary', course_id=course.id)
+        elif 'newsection' in request.POST:
+            if request.POST['sectionname']:
+                numberofsections = course.section_set.count()
+                section = Section()
+                section.name = request.POST['sectionname']
+                section.course = course
+                section.order = numberofsections + 1
+                section.save()
+                return redirect('editsection', section_id=section.id)
+        elif 'newtopic' in request.POST:
+            try:
+                topic = Topic.objects.get(title__iexact=request.POST['topictitle'])
+            except:
+                topic = Topic()
+                topic.title = request.POST['topictitle']
+                topic.save()
+            savecourse(request, course)
+            course.topic = topic
+            course.save()
+            return redirect('editcourse', course_id=course.id)
+        elif 'save' in request.POST:
+            if request.POST['title'] and request.POST.getlist('topic'):
+                savecourse(request, course)
+                return redirect('editcourse', course_id=course.id)
+            else:
+                return render(request, 'topics/editcourse.html',
+                              {'teacher': teacher, 'topics': topics, 'course': course, 'error': 'Title and Topic fields are required'})
+        elif 'save_exit' in request.POST:
+            if request.POST['title'] and request.POST.getlist('topic'):
+                savecourse(request, course)
+                return redirect('teacher')
+            else:
+                return render(request, 'topics/editcourse.html', {'topics': topics, 'course': course, 'error': 'Title and Topic fields are required'})
+        elif 'publish' in request.POST:
+            if request.POST['title'] and request.POST.getlist('topic'):
+                savecourse(request, course)
+                if course.isPublishable == True:
+                    course.published = True
+                    course.save()
+                    return redirect('teacher')
+                else:
+                    course.published = False
+                    course.save()
+                    return render(request, 'topics/editcourse.html', {'topics': topics, 'course': course, 'error': 'One of the sections is not submitted.'})
+            else:
+                return render(request, 'topics/editcourse.html', {'topics': topics, 'course': course, 'error': 'Title and Topic fields are required'})
+        return render(request, 'topics/editcourse.html', {'teacher': teacher, 'topics': topics, 'course': course}, )
+    else:
+        return render(request, 'topics/editcourse.html', {'teacher': teacher, 'topics': topics, 'course': course}, )
 
 
-	if request.FILES.get('image', False):
-		course.image = request.FILES['image']
+def savecourse(request, course):
+    if 'section-order' in request.POST:
+        ordersection(request)
 
+    course.title = request.POST['title']
+    print(request.POST)
+    if 'description' in request.POST:
+        course.description = request.POST['description']
+        course.wywl = request.POST['wywl']
+    course.pubdate = timezone.datetime.now()
+    course.teacher = request.user
 
+    if 'topic' in request.POST:
+        topic_title = request.POST.get('topic')
+        course.topic = Topic.objects.get(id=topic_title)
 
-	if course.section_set.all():
-		for section in course.section_set.all():
-			if section.isPublishable == True:
-				course.isPublishable = True
-			else:
-				course.isPublishable = False
-				course.published = False
-				break
+    if request.FILES.get('image', False):
+        course.image = request.FILES['image']
 
-	course.save()
+    if course.section_set.all():
+        for section in course.section_set.all():
+            if section.isPublishable == True:
+                course.isPublishable = True
+            else:
+                course.isPublishable = False
+                course.published = False
+                break
+
+    course.save()
+
 
 @login_required
 @course_teacher_is_user
 def glossary(request, course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	teacher = course.teacher
+    course = get_object_or_404(Course, pk=course_id)
+    teacher = course.teacher
 
-	if 'search_glossary' in request.POST:
-		if request.POST['search_glossary']:
-			API_ENDPOINT = "https://www.wikidata.org/w/api.php"
-			query =  request.POST['search_glossary']
-			params = {
-			    'action': 'wbsearchentities',
-			    'format': 'json',
-			    'language': 'en',
-			    'limit': '2000',
-			    'search': query
-			}
-			wiki_request = requests.get(API_ENDPOINT, params = params)
-			r_json = wiki_request.json()['search']
-			r_json = json.dumps(r_json)
-			r_json = json.loads(r_json)
-			return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course, 'r_json': r_json})
-		else:
-			return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course})
-	else:
-		return render(request, 'topics/glossary.html',{'teacher':teacher,'course': course})
-
-
-
-def newglossary(request,course_id,wiki_id):
-	glossary = Glossary()
-	course =  get_object_or_404(Course,pk=course_id)
+    if 'search_glossary' in request.POST:
+        if request.POST['search_glossary']:
+            API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+            query = request.POST['search_glossary']
+            params = {
+                'action': 'wbsearchentities',
+                'format': 'json',
+                'language': 'en',
+                'limit': '2000',
+                'search': query
+            }
+            wiki_request = requests.get(API_ENDPOINT, params=params)
+            r_json = wiki_request.json()['search']
+            r_json = json.dumps(r_json)
+            r_json = json.loads(r_json)
+            return render(request, 'topics/glossary.html', {'teacher': teacher, 'course': course, 'r_json': r_json})
+        else:
+            return render(request, 'topics/glossary.html', {'teacher': teacher, 'course': course})
+    else:
+        return render(request, 'topics/glossary.html', {'teacher': teacher, 'course': course})
 
 
-	API_ENDPOINT = "https://www.wikidata.org/w/api.php"
-	query =  wiki_id
-	params = {
-		    'action': 'wbsearchentities',
-		    'format': 'json',
-		    'language': 'en',
-		    'limit': '1',
-		    'search': query
-		}
-	wiki_request = requests.get(API_ENDPOINT, params = params)
-	r_json = wiki_request.json()['search']
-	r_json = json.dumps(r_json)
-	r_json = json.loads(r_json)
+def newglossary(request, course_id, wiki_id):
+    glossary = Glossary()
+    course = get_object_or_404(Course, pk=course_id)
 
-	for entity in r_json:
-		glossary.name = entity.get("label", "")
-		glossary.description = entity.get("description", "")
-		glossary.url = "https:" + entity.get("url", "")
-		glossary.identifier = wiki_id
+    API_ENDPOINT = "https://www.wikidata.org/w/api.php"
+    query = wiki_id
+    params = {
+        'action': 'wbsearchentities',
+        'format': 'json',
+        'language': 'en',
+        'limit': '1',
+        'search': query
+    }
+    wiki_request = requests.get(API_ENDPOINT, params=params)
+    r_json = wiki_request.json()['search']
+    r_json = json.dumps(r_json)
+    r_json = json.loads(r_json)
 
-	try:
-		URL = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={}&format=json".format(wiki_id)
-		R = requests.get(URL).json()
-		image_name= R['claims']['P18'][0]['mainsnak']['datavalue']['value']
-		image_name = image_name.replace(' ', '_')
-		md5sum = hashlib.md5(image_name.encode('utf-8')).hexdigest()
-		a = md5sum[:1]
-		ab = md5sum[:2]
-		image_URL = "https://upload.wikimedia.org/wikipedia/commons/{}/{}/{}".format(a,ab,image_name)
-		glossary.image_url = image_URL
-	except:
-		pass
+    for entity in r_json:
+        glossary.name = entity.get("label", "")
+        glossary.description = entity.get("description", "")
+        glossary.url = "https:" + entity.get("url", "")
+        glossary.identifier = wiki_id
 
-	glossary.course = course
-	glossary.save()
-	return redirect('glossary', course_id=course.id)
+    try:
+        URL = "https://www.wikidata.org/w/api.php?action=wbgetclaims&entity={}&format=json".format(wiki_id)
+        R = requests.get(URL).json()
+        image_name = R['claims']['P18'][0]['mainsnak']['datavalue']['value']
+        image_name = image_name.replace(' ', '_')
+        md5sum = hashlib.md5(image_name.encode('utf-8')).hexdigest()
+        a = md5sum[:1]
+        ab = md5sum[:2]
+        image_URL = "https://upload.wikimedia.org/wikipedia/commons/{}/{}/{}".format(a, ab, image_name)
+        glossary.image_url = image_URL
+    except:
+        pass
+
+    glossary.course = course
+    glossary.save()
+    return redirect('glossary', course_id=course.id)
+
 
 @login_required
 @glossary_teacher_is_user
-def deleteglossary(request,glossary_id):
-	glossary =  get_object_or_404(Glossary,pk=glossary_id)
-	course = glossary.course
-	glossary.delete()
-	return redirect('glossary', course_id=course.id)
+def deleteglossary(request, glossary_id):
+    glossary = get_object_or_404(Glossary, pk=glossary_id)
+    course = glossary.course
+    glossary.delete()
+    return redirect('glossary', course_id=course.id)
 
 
 @login_required
 @course_teacher_is_user
-def deletecourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id)
-	course.delete()
-	return redirect('teacher')
+def deletecourse(request, course_id):
+    course = get_object_or_404(Course, pk=course_id)
+    course.delete()
+    return redirect('teacher')
+
 
 @login_required
 @course_teacher_is_user
-def deletelabel(request,label_id, course_id):
-	label = get_object_or_404(Label,pk=label_id)
-	course =  get_object_or_404(Course,pk=course_id)
-	course.label.remove(label)
-	return redirect('editcourse', course_id=course.id)
-
+def deletelabel(request, label_id, course_id):
+    label = get_object_or_404(Label, pk=label_id)
+    course = get_object_or_404(Course, pk=course_id)
+    course.label.remove(label)
+    return redirect('editcourse', course_id=course.id)
 
 
 @login_required
 def ordersection(request):
-	if request.POST['section-order']:
-		order_array = request.POST['section-order']
-		order_array = order_array.split(',')
+    if request.POST['section-order']:
+        order_array = request.POST['section-order']
+        order_array = order_array.split(',')
 
-		i = 1
-		for section_id in order_array:
-			section = get_object_or_404(Section,pk=section_id)
-			section.order = i
-			section.save()
-			i += 1
+        i = 1
+        for section_id in order_array:
+            section = get_object_or_404(Section, pk=section_id)
+            section.order = i
+            section.save()
+            i += 1
+
 
 @login_required
 @section_teacher_is_user
-def editsection(request,section_id):
-	section =  get_object_or_404(Section,pk=section_id)
-	learningpath = getlearningpath(section_id)
-	teacher = section.course.teacher
+def editsection(request, section_id):
+    section = get_object_or_404(Section, pk=section_id)
+    learningpath = getlearningpath(section_id)
+    teacher = section.course.teacher
 
-	if section.quiz_set.all() or section.lecture_set.all():
-		section.isPublishable = True
-		if section.quiz_set.all():
-			for quiz in section.quiz_set.all():
-				if quiz.isPublishable == True:
-					section.isPublishable = True
-				else:
-					section.isPublishable = False
-					break
-	else:
-		section.isPublishable = False
+    if section.quiz_set.all() or section.lecture_set.all():
+        section.isPublishable = True
+        if section.quiz_set.all():
+            for quiz in section.quiz_set.all():
+                if quiz.isPublishable == True:
+                    section.isPublishable = True
+                else:
+                    section.isPublishable = False
+                    break
+    else:
+        section.isPublishable = False
 
-
-	if request.method == 'POST':
-		if 'save_section' in request.POST:
-			if request.POST['sectionname']:
-				savesection(request,section)
-				return redirect('editsection', section_id=section.id)
-			else:
-				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
-		if 'save_exit_section' in request.POST:
-			if request.POST['sectionname']:
-				savesection(request,section)
-				return redirect('editcourse', course_id=section.course.id)
-			else:
-				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
-		if 'submit_section' in request.POST:
-			if request.POST['sectionname']:
-				savesection(request,section)
-				if section.isPublishable == True:
-					return redirect('editcourse', course_id=section.course.id)
-				else:
-					return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Not all quizzes or lectures are submitted in this section'})
-			else:
-				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'error': 'Name field is required'})
-		if 'addresource' in request.POST:
-			if request.FILES.get('resource', False) and request.POST['resourcename']:
-				resource = Resource()
-				resource.name = request.POST['resourcename']
-				resource.link = request.FILES['resource']
-				resource.section = section
-				resource.save()
-				return redirect('editsection', section_id=section.id)
-			else:
-				return render(request, 'topics/editsection.html', {'teacher':teacher,'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
-		if 'newlecture' in request.POST:
-			if request.POST['itemtitle']:
-				lecture = Lecture()
-				lecture.title = request.POST['itemtitle']
-				lecture.section = section
-				lecture.order = len(learningpath)+1
-				lecture.save()
-				return redirect('editlecture', lecture_id=lecture.id)
-		if 'newquiz' in request.POST:
-			if request.POST['itemtitle']:
-				quiz = Quiz()
-				quiz.title = request.POST['itemtitle']
-				quiz.section = section
-				quiz.order = len(learningpath)+1
-				quiz.save()
-				return redirect('editquiz', quiz_id=quiz.id)
-		return render(request, 'topics/editsection.html',{'teacher':teacher,'section': section, 'learningpath': learningpath})
-	else:
-		return render(request, 'topics/editsection.html',{'teacher':teacher,'section': section, 'learningpath': learningpath})
-
-
-def savesection(request,section):
-
-	if 'lp-order' in request.POST:
-		orderlp(request)
-
-	section.name = request.POST['sectionname']
-	section.description = request.POST['sectiondescription']
-
-	if section.quiz_set.all() or section.lecture_set.all():
-		section.isPublishable = True
-		if section.quiz_set.all():
-			for quiz in section.quiz_set.all():
-				if quiz.isPublishable == True:
-					section.isPublishable = True
-				else:
-					section.isPublishable = False
-					break
-	else:
-		section.isPublishable = False
+    if request.method == 'POST':
+        if 'save_section' in request.POST:
+            if request.POST['sectionname']:
+                savesection(request, section)
+                return redirect('editsection', section_id=section.id)
+            else:
+                return render(request, 'topics/editsection.html', {'teacher': teacher, 'section': section, 'error': 'Name field is required'})
+        if 'save_exit_section' in request.POST:
+            if request.POST['sectionname']:
+                savesection(request, section)
+                return redirect('editcourse', course_id=section.course.id)
+            else:
+                return render(request, 'topics/editsection.html', {'teacher': teacher, 'section': section, 'error': 'Name field is required'})
+        if 'submit_section' in request.POST:
+            if request.POST['sectionname']:
+                savesection(request, section)
+                if section.isPublishable == True:
+                    return redirect('editcourse', course_id=section.course.id)
+                else:
+                    return render(request, 'topics/editsection.html',
+                                  {'teacher': teacher, 'section': section, 'error': 'Not all quizzes or lectures are submitted in this section'})
+            else:
+                return render(request, 'topics/editsection.html', {'teacher': teacher, 'section': section, 'error': 'Name field is required'})
+        if 'addresource' in request.POST:
+            if request.FILES.get('resource', False) and request.POST['resourcename']:
+                resource = Resource()
+                resource.name = request.POST['resourcename']
+                resource.link = request.FILES['resource']
+                resource.section = section
+                resource.save()
+                return redirect('editsection', section_id=section.id)
+            else:
+                return render(request, 'topics/editsection.html',
+                              {'teacher': teacher, 'section': section, 'learningpath': learningpath, 'error': 'Resource and Resource Name fields are required'})
+        if 'newlecture' in request.POST:
+            if request.POST['itemtitle']:
+                lecture = Lecture()
+                lecture.title = request.POST['itemtitle']
+                lecture.section = section
+                lecture.order = len(learningpath) + 1
+                lecture.save()
+                return redirect('editlecture', lecture_id=lecture.id)
+        if 'newquiz' in request.POST:
+            if request.POST['itemtitle']:
+                quiz = Quiz()
+                quiz.title = request.POST['itemtitle']
+                quiz.section = section
+                quiz.order = len(learningpath) + 1
+                quiz.save()
+                return redirect('editquiz', quiz_id=quiz.id)
+        return render(request, 'topics/editsection.html', {'teacher': teacher, 'section': section, 'learningpath': learningpath})
+    else:
+        return render(request, 'topics/editsection.html', {'teacher': teacher, 'section': section, 'learningpath': learningpath})
 
 
+def savesection(request, section):
+    if 'lp-order' in request.POST:
+        orderlp(request)
 
-	if 'sectionislinked' in request.POST:
-		section.isLinked = True
-	else:
-		section.isLinked = False
+    section.name = request.POST['sectionname']
+    section.description = request.POST['sectiondescription']
 
-	section.save()
+    if section.quiz_set.all() or section.lecture_set.all():
+        section.isPublishable = True
+        if section.quiz_set.all():
+            for quiz in section.quiz_set.all():
+                if quiz.isPublishable == True:
+                    section.isPublishable = True
+                else:
+                    section.isPublishable = False
+                    break
+    else:
+        section.isPublishable = False
+
+    if 'sectionislinked' in request.POST:
+        section.isLinked = True
+    else:
+        section.isLinked = False
+
+    section.save()
+
 
 @login_required
 def orderlp(request):
-	if request.POST['lp-order']:
-		order_array = request.POST['lp-order']
-		order_array = order_array.split(',')
+    if request.POST['lp-order']:
+        order_array = request.POST['lp-order']
+        order_array = order_array.split(',')
 
-		i = 1
-		for lp_item in order_array:
-			item = lp_item.split(':')
-			itemtype = item[0]
-			itemid = item[1]
-			if itemtype == Lecture._meta.verbose_name:
-				lecture = get_object_or_404(Lecture,pk=itemid)
-				lecture.order = i
-				lecture.save()
-			elif itemtype == Quiz._meta.verbose_name:
-				quiz = get_object_or_404(Quiz,pk=itemid)
-				quiz.order = i
-				quiz.save()
-			i += 1
+        i = 1
+        for lp_item in order_array:
+            item = lp_item.split(':')
+            itemtype = item[0]
+            itemid = item[1]
+            if itemtype == Lecture._meta.verbose_name:
+                lecture = get_object_or_404(Lecture, pk=itemid)
+                lecture.order = i
+                lecture.save()
+            elif itemtype == Quiz._meta.verbose_name:
+                quiz = get_object_or_404(Quiz, pk=itemid)
+                quiz.order = i
+                quiz.save()
+            i += 1
+
 
 def getlearningpath(section_id):
-    lectures = Lecture.objects.filter(section= section_id)
-    quizs = Quiz.objects.filter(section= section_id)
+    lectures = Lecture.objects.filter(section=section_id)
+    quizs = Quiz.objects.filter(section=section_id)
     learningpath = sorted(
         chain(lectures, quizs),
         key=lambda item: item.order, reverse=False)
     return learningpath
 
+
 @login_required
 @section_teacher_is_user
-def deletesection(request,section_id):
-	section = get_object_or_404(Section,pk=section_id)
-	course_id = section.course.id
-	section.delete()
-	return redirect('editcourse', course_id=course_id)
+def deletesection(request, section_id):
+    section = get_object_or_404(Section, pk=section_id)
+    course_id = section.course.id
+    section.delete()
+    return redirect('editcourse', course_id=course_id)
 
 
 @login_required
-def deleteresource(request,resource_id):
-	resource = get_object_or_404(Resource,pk=resource_id)
-	section_id = resource.section.id
-	resource.delete()
-	return redirect('editsection', section_id=section_id)
+def deleteresource(request, resource_id):
+    resource = get_object_or_404(Resource, pk=resource_id)
+    section_id = resource.section.id
+    resource.delete()
+    return redirect('editsection', section_id=section_id)
+
 
 @login_required
 @lecture_teacher_is_user
 def editlecture(request, lecture_id):
-	lecture =  get_object_or_404(Lecture,pk=lecture_id)
-	teacher = lecture.section.course.teacher
+    lecture = get_object_or_404(Lecture, pk=lecture_id)
+    teacher = lecture.section.course.teacher
 
-	if request.method == 'POST':
-		if 'save_lecture' in request.POST:
-			if request.POST['lecturetitle']:
-				savelecture(request,lecture)
-				return redirect('editlecture', lecture_id=lecture.id)
-			else:
-				return render(request, 'topics/editlecture.html', {'teacher':teacher,'lecture': lecture, 'error': 'Title field is required'})
-		if 'submit_lecture' in request.POST:
-			if request.POST['lecturetitle']:
-				savelecture(request,lecture)
-				return redirect('editsection', section_id=lecture.section.id)
-			else:
-				return render(request, 'topics/editlecture.html', {'teacher':teacher,'lecture': lecture, 'error': 'Title field is required'})
-		return render(request, 'topics/editlecture.html',{'teacher':teacher,'lecture': lecture})
-	else:
-		return render(request, 'topics/editlecture.html',{'teacher':teacher,'lecture': lecture})
+    if request.method == 'POST':
+        if 'save_lecture' in request.POST:
+            if request.POST['lecturetitle']:
+                savelecture(request, lecture)
+                return redirect('editlecture', lecture_id=lecture.id)
+            else:
+                return render(request, 'topics/editlecture.html', {'teacher': teacher, 'lecture': lecture, 'error': 'Title field is required'})
+        if 'submit_lecture' in request.POST:
+            if request.POST['lecturetitle']:
+                savelecture(request, lecture)
+                return redirect('editsection', section_id=lecture.section.id)
+            else:
+                return render(request, 'topics/editlecture.html', {'teacher': teacher, 'lecture': lecture, 'error': 'Title field is required'})
+        return render(request, 'topics/editlecture.html', {'teacher': teacher, 'lecture': lecture})
+    else:
+        return render(request, 'topics/editlecture.html', {'teacher': teacher, 'lecture': lecture})
+
 
 @login_required
 @lecture_teacher_is_user
-def deletelecture(request,lecture_id):
-	lecture = get_object_or_404(Lecture,pk=lecture_id)
-	section_id = lecture.section.id
-	lecture.delete()
-	return redirect('editsection', section_id=section_id)
+def deletelecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, pk=lecture_id)
+    section_id = lecture.section.id
+    lecture.delete()
+    return redirect('editsection', section_id=section_id)
 
-def savelecture(request,lecture):
 
-	lecture.title = request.POST['lecturetitle']
-	lecture.body = request.POST['lecturebody']
-	lecture.save()
+def savelecture(request, lecture):
+    lecture.title = request.POST['lecturetitle']
+    lecture.body = request.POST['lecturebody']
+    lecture.save()
+
 
 @login_required
 @quiz_teacher_is_user
 def editquiz(request, quiz_id):
-	quiz =  get_object_or_404(Quiz,pk=quiz_id)
-	teacher = quiz.section.course.teacher
+    quiz = get_object_or_404(Quiz, pk=quiz_id)
+    teacher = quiz.section.course.teacher
 
-	if quiz.question_set.all():
-		for question in quiz.question_set.all():
-			if question.isPublishable == True:
-				quiz.isPublishable = True
-			else:
-				quiz.isPublishable = False
-				break
-	else:
-		quiz.isPublishable = False
+    if quiz.question_set.all():
+        for question in quiz.question_set.all():
+            if question.isPublishable == True:
+                quiz.isPublishable = True
+            else:
+                quiz.isPublishable = False
+                break
+    else:
+        quiz.isPublishable = False
 
-	if request.method == 'POST':
-			if 'save_quiz' in request.POST:
-				if request.POST['quiztitle']:
-					savequiz(request,quiz)
-					return redirect('editquiz', quiz_id=quiz.id)
-				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})
-			if 'save_exit_quiz' in request.POST:
-				if request.POST['quiztitle']:
-					savequiz(request,quiz)
-					return redirect('editsection', section_id=quiz.section.id)
-				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})
-			if 'submit_quiz' in request.POST:
-				if request.POST['quiztitle']:
-					savequiz(request,quiz)
-					if quiz.isPublishable == True:
-						return redirect('editsection', section_id=quiz.section.id)
-					else:
-						return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Please submit questions'})
-				else:
-					return render(request, 'topics/editquiz.html', {'teacher':teacher,'quiz': quiz, 'error': 'Quiz title field is required'})
-			if 'newquestion' in request.POST:
-				if request.POST['questiontitle']:
-					numberofquestions = quiz.question_set.count()
-					question = Question()
-					question.title = request.POST['questiontitle']
-					question.quiz = quiz
-					question.order = numberofquestions+1
-					question.save()
-					return redirect('editquestion', question_id=question.id)
-			return render(request, 'topics/editquiz.html',{'teacher':teacher,'quiz': quiz})
-	else:
-		return render(request, 'topics/editquiz.html',{'teacher':teacher,'quiz': quiz})
-
-def savequiz(request,quiz):
+    if request.method == 'POST':
+        if 'save_quiz' in request.POST:
+            if request.POST['quiztitle']:
+                savequiz(request, quiz)
+                return redirect('editquiz', quiz_id=quiz.id)
+            else:
+                return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz, 'error': 'Quiz title field is required'})
+        if 'save_exit_quiz' in request.POST:
+            if request.POST['quiztitle']:
+                savequiz(request, quiz)
+                return redirect('editsection', section_id=quiz.section.id)
+            else:
+                return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz, 'error': 'Quiz title field is required'})
+        if 'submit_quiz' in request.POST:
+            if request.POST['quiztitle']:
+                savequiz(request, quiz)
+                if quiz.isPublishable == True:
+                    return redirect('editsection', section_id=quiz.section.id)
+                else:
+                    return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz, 'error': 'Please submit questions'})
+            else:
+                return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz, 'error': 'Quiz title field is required'})
+        if 'newquestion' in request.POST:
+            if request.POST['questiontitle']:
+                numberofquestions = quiz.question_set.count()
+                question = Question()
+                question.title = request.POST['questiontitle']
+                question.quiz = quiz
+                question.order = numberofquestions + 1
+                question.save()
+                return redirect('editquestion', question_id=question.id)
+        return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz})
+    else:
+        return render(request, 'topics/editquiz.html', {'teacher': teacher, 'quiz': quiz})
 
 
-	orderquestion(request)
+def savequiz(request, quiz):
+    orderquestion(request)
 
-	quiz.title = request.POST['quiztitle']
-	quiz.successrate = request.POST['quizsuccessrate']
+    quiz.title = request.POST['quiztitle']
+    quiz.successrate = request.POST['quizsuccessrate']
 
-	if quiz.question_set.all():
-		for question in quiz.question_set.all():
-			if question.isPublishable == True:
-				quiz.isPublishable = True
-			else:
-				quiz.isPublishable = False
-				break
-	else:
-		quiz.isPublishable = False
-	quiz.save()
+    if quiz.question_set.all():
+        for question in quiz.question_set.all():
+            if question.isPublishable == True:
+                quiz.isPublishable = True
+            else:
+                quiz.isPublishable = False
+                break
+    else:
+        quiz.isPublishable = False
+    quiz.save()
+
 
 @login_required
 def orderquestion(request):
-	if request.POST['question-order']:
-		order_array = request.POST['question-order']
-		order_array = order_array.split(',')
+    if request.POST['question-order']:
+        order_array = request.POST['question-order']
+        order_array = order_array.split(',')
 
-		i = 1
-		for question_id in order_array:
-			question = get_object_or_404(Question,pk=question_id)
-			question.order = i
-			question.save()
-			i += 1
+        i = 1
+        for question_id in order_array:
+            question = get_object_or_404(Question, pk=question_id)
+            question.order = i
+            question.save()
+            i += 1
+
 
 @login_required
 @quiz_teacher_is_user
-def deletequiz(request,quiz_id):
-	quiz = get_object_or_404(Quiz,pk=quiz_id)
-	section_id = quiz.section.id
-	quiz.delete()
-	return redirect('editsection', section_id=section_id)
+def deletequiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, pk=quiz_id)
+    section_id = quiz.section.id
+    quiz.delete()
+    return redirect('editsection', section_id=section_id)
+
 
 @login_required
 @question_teacher_is_user
 def editquestion(request, question_id):
-	question =  get_object_or_404(Question,pk=question_id)
-	teacher = question.quiz.section.course.teacher
+    question = get_object_or_404(Question, pk=question_id)
+    teacher = question.quiz.section.course.teacher
 
-	answer_selected = False
+    answer_selected = False
 
-	for choice in question.choice_set.all():
-		if choice.isTrue:
-			answer_selected = True
+    for choice in question.choice_set.all():
+        if choice.isTrue:
+            answer_selected = True
 
+    if question.choice_set.all() and answer_selected:
+        question.isPublishable = True
+    else:
+        question.isPublishable = False
 
-	if question.choice_set.all() and answer_selected:
-		question.isPublishable = True
-	else:
-		question.isPublishable = False
+    if request.method == 'POST':
+        if 'save_question' in request.POST:
+            if request.POST['questiontitle']:
+                savequestion(request, question)
+                return redirect('editquestion', question_id=question.id)
+            else:
+                return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question, 'error': 'Quiz title field is required'})
+        if 'save_exit_question' in request.POST:
+            if request.POST['questiontitle']:
+                savequestion(request, question)
+                return redirect('editquiz', quiz_id=question.quiz.id)
+            else:
+                return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question, 'error': 'Question is required'})
+        if 'submit_question' in request.POST:
+            if request.POST['questiontitle']:
+                savequestion(request, question)
+                if question.isPublishable == True:
+                    return redirect('editquiz', quiz_id=question.quiz.id)
+                else:
+                    return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question, 'error': 'Answers are required'})
+            else:
+                return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question, 'error': 'Question is required'})
+        if 'newchoice' in request.POST:
+            if request.POST['choicetitle']:
+                numberofchoices = question.choice_set.count()
+                choice = Choice()
+                choice.title = request.POST['choicetitle']
+                choice.question = question
+                choice.order = numberofchoices + 1
+                choice.save()
+                return redirect('editquestion', question_id=question.id)
+        elif 'choicetitleedit' in request.POST:
+            if request.POST['edit_choicetitle']:
+                choice_id = request.POST['edit_choiceid']
+                choice = get_object_or_404(Choice, pk=choice_id)
+                choice.title = request.POST['edit_choicetitle']
+                choice.save()
+            return redirect('editquestion', question_id=question.id)
+        return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question})
+    else:
+        return render(request, 'topics/editquestion.html', {'teacher': teacher, 'question': question})
 
-	if request.method == 'POST':
-			if 'save_question' in request.POST:
-				if request.POST['questiontitle']:
-					savequestion(request,question)
-					return redirect('editquestion', question_id=question.id)
-				else:
-					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Quiz title field is required'})
-			if 'save_exit_question' in request.POST:
-				if request.POST['questiontitle']:
-					savequestion(request,question)
-					return redirect('editquiz', quiz_id=question.quiz.id)
-				else:
-					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Question is required'})
-			if 'submit_question' in request.POST:
-				if request.POST['questiontitle']:
-					savequestion(request,question)
-					if question.isPublishable == True:
-						return redirect('editquiz', quiz_id=question.quiz.id)
-					else:
-						return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Answers are required'})
-				else:
-					return render(request, 'topics/editquestion.html', {'teacher':teacher,'question': question, 'error': 'Question is required'})
-			if 'newchoice' in request.POST:
-				if request.POST['choicetitle']:
-					numberofchoices = question.choice_set.count()
-					choice = Choice()
-					choice.title = request.POST['choicetitle']
-					choice.question = question
-					choice.order = numberofchoices + 1
-					choice.save()
-					return redirect('editquestion', question_id=question.id)
-			elif 'choicetitleedit' in request.POST:
-				if request.POST['edit_choicetitle']:
-					choice_id = request.POST['edit_choiceid']
-					choice = get_object_or_404(Choice,pk=choice_id)
-					choice.title = request.POST['edit_choicetitle']
-					choice.save()
-				return redirect('editquestion', question_id=question.id)
-			return render(request, 'topics/editquestion.html',{'teacher':teacher,'question': question})
-	else:
-		return render(request, 'topics/editquestion.html',{'teacher':teacher,'question': question})
 
 @login_required
 @question_teacher_is_user
-def deletequestion(request,question_id):
-	question = get_object_or_404(Question,pk=question_id)
-	quiz_id = question.quiz.id
-	question.delete()
-	return redirect('editquiz', quiz_id=quiz_id)
+def deletequestion(request, question_id):
+    question = get_object_or_404(Question, pk=question_id)
+    quiz_id = question.quiz.id
+    question.delete()
+    return redirect('editquiz', quiz_id=quiz_id)
+
 
 @login_required
-def savequestion(request,question):
+def savequestion(request, question):
+    orderchoice(request)
 
-	orderchoice(request)
+    question.title = request.POST['questiontitle']
 
-	question.title = request.POST['questiontitle']
+    answer_selected = False
 
-	answer_selected = False
+    for choice in question.choice_set.all():
+        if choice.isTrue:
+            answer_selected = True
 
-	for choice in question.choice_set.all():
-		if choice.isTrue:
-			answer_selected = True
+    if question.choice_set.all() and answer_selected:
+        question.isPublishable = True
+    else:
+        question.isPublishable = False
 
+    question.save()
 
-	if question.choice_set.all() and answer_selected:
-		question.isPublishable = True
-	else:
-		question.isPublishable = False
-
-
-	question.save()
 
 @login_required
 def orderchoice(request):
-	if request.POST['choice-order']:
-		order_array = request.POST['choice-order']
-		order_array = order_array.split(',')
+    if request.POST['choice-order']:
+        order_array = request.POST['choice-order']
+        order_array = order_array.split(',')
 
+        if 'choice-radio' in request.POST:
+            trueChoice = request.POST['choice-radio']
+        else:
+            trueChoice = -1
 
-		if 'choice-radio' in request.POST:
-			trueChoice = request.POST['choice-radio']
-		else:
-			trueChoice = -1
+        i = 1
+        for choice_id in order_array:
+            choice = get_object_or_404(Choice, pk=choice_id)
+            choice.order = i
+            if choice_id == trueChoice:
+                choice.isTrue = True
+            else:
+                choice.isTrue = False
+            choice.save()
+            i += 1
 
-		i = 1
-		for choice_id in order_array:
-			choice = get_object_or_404(Choice,pk=choice_id)
-			choice.order = i
-			if choice_id == trueChoice:
-				choice.isTrue = True
-			else:
-				choice.isTrue = False
-			choice.save()
-			i += 1
 
 @login_required
 @choice_teacher_is_user
-def deletechoice(request,choice_id):
-	choice = get_object_or_404(Choice,pk=choice_id)
-	question_id = choice.question.id
-	choice.delete()
-	return redirect('editquestion', question_id=question_id)
+def deletechoice(request, choice_id):
+    choice = get_object_or_404(Choice, pk=choice_id)
+    question_id = choice.question.id
+    choice.delete()
+    return redirect('editquestion', question_id=question_id)
 
 
 @login_required
-def enrollcourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id, published=True)
+def enrollcourse(request, course_id):
+    course = get_object_or_404(Course, pk=course_id, published=True)
 
-	learner, created = Learner.objects.get_or_create(user=request.user)
-	learner.save()
+    learner, created = Learner.objects.get_or_create(user=request.user)
+    learner.save()
 
-	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
-	learner_course_record.save()
+    learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner, course=course)
+    learner_course_record.save()
 
-	return redirect('viewcourse', course_id=course_id)
+    return redirect('viewcourse', course_id=course_id)
+
 
 @login_required
-def unenrollcourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner, created = Learner.objects.get_or_create(user=request.user)
-	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
-	learner_course_record.delete()
-	return redirect('learner')
-
+def unenrollcourse(request, course_id):
+    course = get_object_or_404(Course, pk=course_id, published=True)
+    learner, created = Learner.objects.get_or_create(user=request.user)
+    learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner, course=course)
+    learner_course_record.delete()
+    return redirect('learner')
 
 
 @login_required
 def learner(request):
-	learner, created = Learner.objects.get_or_create(user=request.user)
-	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
+    learner, created = Learner.objects.get_or_create(user=request.user)
+    learner_course_record = Learner_Course_Record.objects.filter(learner=learner)
 
-	for learner_cr in learner_course_record:
-		coursefinishcheck(request,learner_cr.course.id)
+    for learner_cr in learner_course_record:
+        coursefinishcheck(request, learner_cr.course.id)
 
-	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
+    learner_course_record = Learner_Course_Record.objects.filter(learner=learner)
 
-	lcr = list()
-	for learner_cr in learner_course_record:
-		if learner_cr.course.published == True:
-			lcr.append(learner_cr)
+    lcr = list()
+    for learner_cr in learner_course_record:
+        if learner_cr.course.published == True:
+            lcr.append(learner_cr)
 
-	lcr_finished = list()
-	for learner_cr in learner_course_record:
-		coursefinishcheck(request,learner_cr.course.id)
-		if learner_cr.isFinished == True:
-			if learner_cr.course.published == True:
-				lcr_finished.append(learner_cr)
+    lcr_finished = list()
+    for learner_cr in learner_course_record:
+        coursefinishcheck(request, learner_cr.course.id)
+        if learner_cr.isFinished == True:
+            if learner_cr.course.published == True:
+                lcr_finished.append(learner_cr)
 
-	return render(request, 'topics/learner.html',{'learner': learner, 'lcr':lcr, 'lcr_finished':lcr_finished })
-
-@login_required
-def viewcourse(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner = get_object_or_404(Learner, user= request.user)
-
-	lsr = list()
-	lsr_finished= list()
-	lsr_all = list()
-	lsr_not_started = list()
-
-	for section in course.section_set.all():
-		sectionfinishcheck(request,section.id)
-		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
-		if learner_section:
-			if learner_section[0].isFinished == True:
-				lsr_finished.append(learner_section[0].section)
-				lsr_all.append(learner_section[0])
-			elif learner_section[0].completeRate == 0:
-				lsr_not_started.append(learner_section[0].section)
-				lsr_all.append(learner_section[0])
-			else:
-				lsr.append(learner_section[0].section)
-				lsr_all.append(learner_section[0])
-
-	coursefinishcheck(request,course_id)
-
-	sections = course.section_set.all()
-
-	for section in sections:
-
-		learningpath = createlearningpath(section.id)
-
-		for item in learningpath:
-			if isinstance(item, Lecture):
-				learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=item)
-				learner_lecture_record.save()
-			elif isinstance(item, Quiz):
-				learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=item)
-				learner_quiz_record.save()
-
-
-	return render(request, 'topics/viewcourse.html',{'learner':learner,'course': course, 'lsr': lsr,'lsr_all': lsr_all,'lsr_finished': lsr_finished,'lsr_not_started': lsr_not_started})
-
-@login_required
-def coursefinishcheck(request,course_id):
-
-	learner = get_object_or_404(Learner, user= request.user)
-	course =  get_object_or_404(Course,pk=course_id)
-	learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner,course=course)
-	sections = Section.objects.filter(course= course_id)
-
-	lsr_finished = list()
-	lsr = list()
-	lir_finished_list = list()
-
-	for section in sections:
-		sectionfinishcheck(request,section.id)
-		lir,lir_finished = pathitemstate(section.id,learner)
-		for item in lir_finished:
-			lir_finished_list.append(item)
-		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
-		if learner_section:
-			if learner_section[0].isFinished == True:
-				lsr_finished.append(learner_section[0].section)
-			else:
-				lsr.append(learner_section[0].section)
-
-
-	if len(lsr_finished) == len(course.section_set.all()):
-		learner_course_record.completeRate = 100
-		learner_course_record.isFinished = True
-		learner_course_record.save()
-	else:
-		#completeRate = len(lsr_finished)/len(course.section_set.all())
-		lpitems = list()
-		sections = course.section_set.all()
-		for section in sections:
-			learningpath = createlearningpath(section.id)
-			for item in learningpath:
-				lpitems.append(item)
-		completeRate = len(lir_finished_list)/len(lpitems)
-		learner_course_record.completeRate = completeRate*100
-		learner_course_record.isFinished = False
-		learner_course_record.save()
-
-@login_required
-def viewglossary(request,course_id):
-	course =  get_object_or_404(Course,pk=course_id, published=True)
-	learner = get_object_or_404(Learner, user= request.user)
-	learner_course_record = Learner_Course_Record.objects.filter(learner = learner)
-
-	lsr = list()
-
-	for section in course.section_set.all():
-		learner_section = Learner_Section_Record.objects.filter(learner = learner, section = section)
-		if learner_section:
-			if learner_section[0].isFinished != True:
-				lsr.append(learner_section[0].section)
-
-
-	return render(request, 'topics/viewglossary.html',{'learner':learner,'course': course , 'lsr': lsr})
-
-@login_required
-def viewsection(request,section_id):
-	section =  get_object_or_404(Section,pk=section_id)
-	learner = get_object_or_404(Learner, user= request.user)
-
-	learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner,section=section)
-	learner_section_record.save()
-
-
-	learningpath = createlearningpath(section_id)
-
-	for item in learningpath:
-		if isinstance(item, Lecture):
-			learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=item)
-			learner_lecture_record.save()
-		elif isinstance(item, Quiz):
-			learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=item)
-			learner_quiz_record.save()
-
-	lir,lir_finished = pathitemstate(section.id,learner)
-
-
-	try:
-		try:
-			if isinstance(lir[0], Lecture):
-				return redirect('viewlecture', lecture_id=lir[0].id)
-			if isinstance(lir[0], Quiz):
-				return redirect('viewquiz', quiz_id=lir[0].id)
-		except:
-			if isinstance(lir_finished[0], Lecture):
-				return redirect('viewlecture', lecture_id=lir_finished[0].id)
-			if isinstance(lir_finished[0], Quiz):
-				return redirect('viewquiz', quiz_id=lir_finished[0].id)
-	except:
-		pass
-
-	return render(request, 'topics/viewsection.html',{'learner':learner,'section': section, 'learningpath':learningpath})
-
-@login_required
-def sectionfinishcheck(request,section_id):
-
-	learner = get_object_or_404(Learner, user= request.user)
-	section =  get_object_or_404(Section,pk=section_id)
-	learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner,section=section)
-	lir,lir_finished = pathitemstate(section.id,learner)
-	learningpath = createlearningpath(section.id)
-
-	if len(lir_finished) == len(learningpath):
-		learner_section_record.isFinished = True
-		learner_section_record.completeRate = 100
-		learner_section_record.save()
-	else:
-		completeRate = len(lir_finished)/len(learningpath)
-		learner_section_record.completeRate = completeRate*100
-		learner_section_record.isFinished = False
-		learner_section_record.save()
+    return render(request, 'topics/learner.html', {'learner': learner, 'lcr': lcr, 'lcr_finished': lcr_finished})
 
 
 @login_required
-def viewlecture(request,lecture_id):
-	lecture =  get_object_or_404(Lecture,pk=lecture_id)
-	learner = get_object_or_404(Learner, user= request.user)
+def viewcourse(request, course_id):
+    course = get_object_or_404(Course, pk=course_id, published=True)
+    learner = get_object_or_404(Learner, user=request.user)
 
-	learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner,lecture=lecture)
-	learner_lecture_record.save()
+    lsr = list()
+    lsr_finished = list()
+    lsr_all = list()
+    lsr_not_started = list()
 
-	learningpath = createlearningpath(lecture.section.id)
-	lir,lir_finished = pathitemstate(lecture.section.id,learner)
+    for section in course.section_set.all():
+        sectionfinishcheck(request, section.id)
+        learner_section = Learner_Section_Record.objects.filter(learner=learner, section=section)
+        if learner_section:
+            if learner_section[0].isFinished == True:
+                lsr_finished.append(learner_section[0].section)
+                lsr_all.append(learner_section[0])
+            elif learner_section[0].completeRate == 0:
+                lsr_not_started.append(learner_section[0].section)
+                lsr_all.append(learner_section[0])
+            else:
+                lsr.append(learner_section[0].section)
+                lsr_all.append(learner_section[0])
 
-	lecture_index = learningpath.index(lecture)
+    coursefinishcheck(request, course_id)
 
-	if request.method == 'POST':
-		if 'finish_section' in request.POST:
-			learner_lecture_record.isFinished = True
-			learner_lecture_record.save()
+    sections = course.section_set.all()
 
-			lir,lir_finished = pathitemstate(lecture.section.id,learner)
-			if len(lir_finished) == len(learningpath):
-				return redirect('viewcourse', course_id=lecture.section.course.id)
-			elif len(lir_finished) != len(learningpath):
-				return redirect('viewsection', section_id=lecture.section.id)
-		elif 'finish_lecture' in request.POST:
-			learner_lecture_record.isFinished = True
-			learner_lecture_record.save()
-			if isinstance(learningpath[lecture_index + 1 ], Lecture):
-				return redirect('viewlecture', lecture_id=learningpath[lecture_index + 1].id)
-			elif isinstance(learningpath[lecture_index + 1 ], Quiz):
-				return redirect('viewquiz', quiz_id=learningpath[lecture_index + 1].id)
+    for section in sections:
 
-	return render(request, 'topics/viewlecture.html',{'learner':learner,'lecture': lecture, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
+        learningpath = createlearningpath(section.id)
+
+        for item in learningpath:
+            if isinstance(item, Lecture):
+                learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner, lecture=item)
+                learner_lecture_record.save()
+            elif isinstance(item, Quiz):
+                learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner, quiz=item)
+                learner_quiz_record.save()
+
+    return render(request, 'topics/viewcourse.html',
+                  {'learner': learner, 'course': course, 'lsr': lsr, 'lsr_all': lsr_all, 'lsr_finished': lsr_finished, 'lsr_not_started': lsr_not_started})
+
 
 @login_required
-def viewquiz(request,quiz_id):
-	quiz =  get_object_or_404(Quiz,pk=quiz_id)
-	learner = get_object_or_404(Learner, user= request.user)
+def coursefinishcheck(request, course_id):
+    learner = get_object_or_404(Learner, user=request.user)
+    course = get_object_or_404(Course, pk=course_id)
+    learner_course_record, created = Learner_Course_Record.objects.get_or_create(learner=learner, course=course)
+    sections = Section.objects.filter(course=course_id)
 
-	learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner,quiz=quiz)
-	learner_quiz_record.save()
+    lsr_finished = list()
+    lsr = list()
+    lir_finished_list = list()
 
-	learningpath = createlearningpath(quiz.section.id)
-	lir,lir_finished = pathitemstate(quiz.section.id,learner)
+    for section in sections:
+        sectionfinishcheck(request, section.id)
+        lir, lir_finished = pathitemstate(section.id, learner)
+        for item in lir_finished:
+            lir_finished_list.append(item)
+        learner_section = Learner_Section_Record.objects.filter(learner=learner, section=section)
+        if learner_section:
+            if learner_section[0].isFinished == True:
+                lsr_finished.append(learner_section[0].section)
+            else:
+                lsr.append(learner_section[0].section)
 
-	quiz_index = learningpath.index(quiz)
-
-	givenanswers = list()
-	correctanswers = list()
-	choiceflag = False
-
-
-	if request.method == 'POST':
-		if 'finish_section' in request.POST or 'finish_quiz' in request.POST:
-			choiceflag = True
-		questions = quiz.question_set.all()
-		number_of_questions = len(questions)
-		successrate = 0
-		for question in questions:
-			choices = question.choice_set.all()
-			for choice in choices:
-				if choice.isTrue == True:
-					correctanswers.append(choice)
-			choice_question_id = "choice-radio-"+ str(question.id)
-			if choice_question_id in request.POST:
-				choiceflag = True
-				answer_id = request.POST[choice_question_id]
-				answer =  get_object_or_404(Choice,pk=answer_id)
-				givenanswers.append(answer)
-				if answer.isTrue == True:
-					successrate += (1/number_of_questions)*100
-					successrate = int(successrate)
-		if choiceflag == False:
-			error = "You have to answer at least one question."
-			return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
+    if len(lsr_finished) == len(course.section_set.all()):
+        learner_course_record.completeRate = 100
+        learner_course_record.isFinished = True
+        learner_course_record.save()
+    else:
+        # completeRate = len(lsr_finished)/len(course.section_set.all())
+        lpitems = list()
+        sections = course.section_set.all()
+        for section in sections:
+            learningpath = createlearningpath(section.id)
+            for item in learningpath:
+                lpitems.append(item)
+        completeRate = len(lir_finished_list) / len(lpitems)
+        learner_course_record.completeRate = completeRate * 100
+        learner_course_record.isFinished = False
+        learner_course_record.save()
 
 
-		if 'finish_section' in request.POST:
-			lir,lir_finished = pathitemstate(quiz.section.id,learner)
-			if len(lir_finished) == len(learningpath):
-				return redirect('viewcourse', course_id=quiz.section.course.id)
-			elif len(lir_finished) != len(learningpath):
-				return redirect('viewsection', section_id=quiz.section.id)
+@login_required
+def viewglossary(request, course_id):
+    course = get_object_or_404(Course, pk=course_id, published=True)
+    learner = get_object_or_404(Learner, user=request.user)
+    learner_course_record = Learner_Course_Record.objects.filter(learner=learner)
 
-		elif 'finish_quiz' in request.POST:
-			if isinstance(learningpath[quiz_index + 1 ], Lecture):
-				return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
-			elif isinstance(learningpath[quiz_index + 1 ], Quiz):
-				return redirect('viewquiz', quiz_id=learningpath[quiz_index + 1].id)
+    lsr = list()
 
-		elif 'complete_quiz' in request.POST:
-			if successrate >= quiz.successrate:
-				learner_quiz_record.isFinished = True
-				learner_quiz_record.save()
-				message = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
-				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'message': message, 'givenanswers':givenanswers, 'correctanswers':correctanswers})
-			elif successrate < quiz.successrate:
-				error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) +"."
-				return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished, 'error': error})
+    for section in course.section_set.all():
+        learner_section = Learner_Section_Record.objects.filter(learner=learner, section=section)
+        if learner_section:
+            if learner_section[0].isFinished != True:
+                lsr.append(learner_section[0].section)
+
+    return render(request, 'topics/viewglossary.html', {'learner': learner, 'course': course, 'lsr': lsr})
 
 
-	return render(request, 'topics/viewquiz.html',{'learner':learner,'quiz': quiz, 'learningpath':learningpath, 'lir':lir, 'lir_finished':lir_finished})
+@login_required
+def viewsection(request, section_id):
+    section = get_object_or_404(Section, pk=section_id)
+    learner = get_object_or_404(Learner, user=request.user)
+
+    learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner, section=section)
+    learner_section_record.save()
+
+    learningpath = createlearningpath(section_id)
+
+    for item in learningpath:
+        if isinstance(item, Lecture):
+            learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner, lecture=item)
+            learner_lecture_record.save()
+        elif isinstance(item, Quiz):
+            learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner, quiz=item)
+            learner_quiz_record.save()
+
+    lir, lir_finished = pathitemstate(section.id, learner)
+
+    try:
+        try:
+            if isinstance(lir[0], Lecture):
+                return redirect('viewlecture', lecture_id=lir[0].id)
+            if isinstance(lir[0], Quiz):
+                return redirect('viewquiz', quiz_id=lir[0].id)
+        except:
+            if isinstance(lir_finished[0], Lecture):
+                return redirect('viewlecture', lecture_id=lir_finished[0].id)
+            if isinstance(lir_finished[0], Quiz):
+                return redirect('viewquiz', quiz_id=lir_finished[0].id)
+    except:
+        pass
+
+    return render(request, 'topics/viewsection.html', {'learner': learner, 'section': section, 'learningpath': learningpath})
+
+
+@login_required
+def sectionfinishcheck(request, section_id):
+    learner = get_object_or_404(Learner, user=request.user)
+    section = get_object_or_404(Section, pk=section_id)
+    learner_section_record, created = Learner_Section_Record.objects.get_or_create(learner=learner, section=section)
+    lir, lir_finished = pathitemstate(section.id, learner)
+    learningpath = createlearningpath(section.id)
+
+    if len(lir_finished) == len(learningpath):
+        learner_section_record.isFinished = True
+        learner_section_record.completeRate = 100
+        learner_section_record.save()
+    else:
+        completeRate = len(lir_finished) / len(learningpath)
+        learner_section_record.completeRate = completeRate * 100
+        learner_section_record.isFinished = False
+        learner_section_record.save()
+
+
+@login_required
+def viewlecture(request, lecture_id):
+    lecture = get_object_or_404(Lecture, pk=lecture_id)
+    learner = get_object_or_404(Learner, user=request.user)
+
+    learner_lecture_record, created = Learner_Lecture_Record.objects.get_or_create(learner=learner, lecture=lecture)
+    learner_lecture_record.save()
+
+    learningpath = createlearningpath(lecture.section.id)
+    lir, lir_finished = pathitemstate(lecture.section.id, learner)
+
+    lecture_index = learningpath.index(lecture)
+
+    if request.method == 'POST':
+        if 'finish_section' in request.POST:
+            learner_lecture_record.isFinished = True
+            learner_lecture_record.save()
+
+            lir, lir_finished = pathitemstate(lecture.section.id, learner)
+            if len(lir_finished) == len(learningpath):
+                return redirect('viewcourse', course_id=lecture.section.course.id)
+            elif len(lir_finished) != len(learningpath):
+                return redirect('viewsection', section_id=lecture.section.id)
+        elif 'finish_lecture' in request.POST:
+            learner_lecture_record.isFinished = True
+            learner_lecture_record.save()
+            if isinstance(learningpath[lecture_index + 1], Lecture):
+                return redirect('viewlecture', lecture_id=learningpath[lecture_index + 1].id)
+            elif isinstance(learningpath[lecture_index + 1], Quiz):
+                return redirect('viewquiz', quiz_id=learningpath[lecture_index + 1].id)
+
+    return render(request, 'topics/viewlecture.html',
+                  {'learner': learner, 'lecture': lecture, 'learningpath': learningpath, 'lir': lir, 'lir_finished': lir_finished})
+
+
+@login_required
+def viewquiz(request, quiz_id):
+    quiz = get_object_or_404(Quiz, pk=quiz_id)
+    learner = get_object_or_404(Learner, user=request.user)
+
+    learner_quiz_record, created = Learner_Quiz_Record.objects.get_or_create(learner=learner, quiz=quiz)
+    learner_quiz_record.save()
+
+    learningpath = createlearningpath(quiz.section.id)
+    lir, lir_finished = pathitemstate(quiz.section.id, learner)
+
+    quiz_index = learningpath.index(quiz)
+
+    givenanswers = list()
+    correctanswers = list()
+    choiceflag = False
+
+    if request.method == 'POST':
+        if 'finish_section' in request.POST or 'finish_quiz' in request.POST:
+            choiceflag = True
+        questions = quiz.question_set.all()
+        number_of_questions = len(questions)
+        successrate = 0
+        for question in questions:
+            choices = question.choice_set.all()
+            for choice in choices:
+                if choice.isTrue == True:
+                    correctanswers.append(choice)
+            choice_question_id = "choice-radio-" + str(question.id)
+            if choice_question_id in request.POST:
+                choiceflag = True
+                answer_id = request.POST[choice_question_id]
+                answer = get_object_or_404(Choice, pk=answer_id)
+                givenanswers.append(answer)
+                if answer.isTrue == True:
+                    successrate += (1 / number_of_questions) * 100
+                    successrate = int(successrate)
+        if choiceflag == False:
+            error = "You have to answer at least one question."
+            return render(request, 'topics/viewquiz.html',
+                          {'learner': learner, 'quiz': quiz, 'learningpath': learningpath, 'lir': lir, 'lir_finished': lir_finished, 'error': error})
+
+        if 'finish_section' in request.POST:
+            lir, lir_finished = pathitemstate(quiz.section.id, learner)
+            if len(lir_finished) == len(learningpath):
+                return redirect('viewcourse', course_id=quiz.section.course.id)
+            elif len(lir_finished) != len(learningpath):
+                return redirect('viewsection', section_id=quiz.section.id)
+
+        elif 'finish_quiz' in request.POST:
+            if isinstance(learningpath[quiz_index + 1], Lecture):
+                return redirect('viewlecture', lecture_id=learningpath[quiz_index + 1].id)
+            elif isinstance(learningpath[quiz_index + 1], Quiz):
+                return redirect('viewquiz', quiz_id=learningpath[quiz_index + 1].id)
+
+        elif 'complete_quiz' in request.POST:
+            if successrate >= quiz.successrate:
+                learner_quiz_record.isFinished = True
+                learner_quiz_record.save()
+                message = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) + "."
+                return render(request, 'topics/viewquiz.html',
+                              {'learner': learner, 'quiz': quiz, 'learningpath': learningpath, 'lir': lir, 'lir_finished': lir_finished, 'message': message,
+                               'givenanswers': givenanswers, 'correctanswers': correctanswers})
+            elif successrate < quiz.successrate:
+                error = "Quiz Passing Criteria is " + str(quiz.successrate) + ". Your score is " + str(successrate) + "."
+                return render(request, 'topics/viewquiz.html',
+                              {'learner': learner, 'quiz': quiz, 'learningpath': learningpath, 'lir': lir, 'lir_finished': lir_finished, 'error': error})
+
+    return render(request, 'topics/viewquiz.html', {'learner': learner, 'quiz': quiz, 'learningpath': learningpath, 'lir': lir, 'lir_finished': lir_finished})
 
 
 def createlearningpath(section_id):
-	lectures = Lecture.objects.filter(section= section_id)
-	quizes = Quiz.objects.filter(section=section_id)
+    lectures = Lecture.objects.filter(section=section_id)
+    quizes = Quiz.objects.filter(section=section_id)
 
-	learningpath = list()
+    learningpath = list()
 
+    for lecture in lectures:
+        learningpath.append(lecture)
+    for quiz in quizes:
+        learningpath.append(quiz)
 
-	for lecture in lectures:
-		learningpath.append(lecture)
-	for quiz in quizes:
-		learningpath.append(quiz)
+    learningpath.sort(key=lambda x: x.order, reverse=False)
 
-	learningpath.sort(key=lambda x: x.order, reverse=False)
-
-	return learningpath
-
-def pathitemstate(section_id,learner):
-
-	learningpath = createlearningpath(section_id)
-
-	lectures = Lecture.objects.filter(section= section_id)
-	quizes = Quiz.objects.filter(section=section_id)
-
-	#learner_lecture_record
-	llr = list()
-	llr_finished= list()
-
-	for lecture in lectures:
-		learner_lecture = Learner_Lecture_Record.objects.filter(learner = learner, lecture = lecture)
-		if learner_lecture:
-			if learner_lecture[0].isFinished == True:
-				llr_finished.append(learner_lecture[0].lecture)
-			else:
-				llr.append(learner_lecture[0].lecture)
-
-	#learner_quiz_record
-	lqr = list()
-	lqr_finished= list()
-
-	for quiz in quizes:
-		quiz_lecture = Learner_Quiz_Record.objects.filter(learner = learner, quiz = quiz)
-		if quiz_lecture:
-			if quiz_lecture[0].isFinished == True:
-				lqr_finished.append(quiz_lecture[0].quiz)
-			else:
-				lqr.append(quiz_lecture[0].quiz)
-
-	lir = list()
-
-	for lecture in llr:
-		lir.append(lecture)
-	for quiz in lqr:
-		lir.append(quiz)
-
-	lir.sort(key=lambda x: x.order, reverse=False)
+    return learningpath
 
 
-	lir_finished = list()
+def pathitemstate(section_id, learner):
+    learningpath = createlearningpath(section_id)
 
-	for lecture in llr_finished:
-		lir_finished.append(lecture)
-	for quiz in lqr_finished:
-		lir_finished.append(quiz)
+    lectures = Lecture.objects.filter(section=section_id)
+    quizes = Quiz.objects.filter(section=section_id)
 
-	lir_finished.sort(key=lambda x: x.order, reverse=False)
+    # learner_lecture_record
+    llr = list()
+    llr_finished = list()
 
-	return lir, lir_finished
+    for lecture in lectures:
+        learner_lecture = Learner_Lecture_Record.objects.filter(learner=learner, lecture=lecture)
+        if learner_lecture:
+            if learner_lecture[0].isFinished == True:
+                llr_finished.append(learner_lecture[0].lecture)
+            else:
+                llr.append(learner_lecture[0].lecture)
+
+    # learner_quiz_record
+    lqr = list()
+    lqr_finished = list()
+
+    for quiz in quizes:
+        quiz_lecture = Learner_Quiz_Record.objects.filter(learner=learner, quiz=quiz)
+        if quiz_lecture:
+            if quiz_lecture[0].isFinished == True:
+                lqr_finished.append(quiz_lecture[0].quiz)
+            else:
+                lqr.append(quiz_lecture[0].quiz)
+
+    lir = list()
+
+    for lecture in llr:
+        lir.append(lecture)
+    for quiz in lqr:
+        lir.append(quiz)
+
+    lir.sort(key=lambda x: x.order, reverse=False)
+
+    lir_finished = list()
+
+    for lecture in llr_finished:
+        lir_finished.append(lecture)
+    for quiz in lqr_finished:
+        lir_finished.append(quiz)
+
+    lir_finished.sort(key=lambda x: x.order, reverse=False)
+
+    return lir, lir_finished
+
 
 @login_required
 def followuser(request, username):
-	user =  get_object_or_404(User,username=request.user.username)
-	following =  get_object_or_404(User,username=username)
-	userfollowing, created = UserFollowing.objects.get_or_create(user=user, following = following)
-	userfollowing.save()
-	return redirect('userprofile', username=following.username)
+    user = get_object_or_404(User, username=request.user.username)
+    following = get_object_or_404(User, username=username)
+    userfollowing, created = UserFollowing.objects.get_or_create(user=user, following=following)
+    userfollowing.save()
+    return redirect('userprofile', username=following.username)
 
 
 @login_required
 def unfollowuser(request, username):
-	user =  get_object_or_404(User,username=request.user.username)
-	following =  get_object_or_404(User,username=username)
-	userfollowing, created = UserFollowing.objects.get_or_create(user=user, following = following)
-	userfollowing.delete()
-	return redirect('userprofile', username=following.username)
+    user = get_object_or_404(User, username=request.user.username)
+    following = get_object_or_404(User, username=username)
+    userfollowing, created = UserFollowing.objects.get_or_create(user=user, following=following)
+    userfollowing.delete()
+    return redirect('userprofile', username=following.username)
+
 
 @login_required
 def news(request):
-	userprofile= UserProfile.objects.get(user=request.user)
-	following_q = userprofile.user.following.all()
-	following = list()
-	for following_item in following_q:
-		following.append(following_item.user)
+    userprofile = UserProfile.objects.get(user=request.user)
+    following_q = userprofile.user.following.all()
+    following = list()
+    for following_item in following_q:
+        following.append(following_item.user)
 
-	json_datas = list()
-	json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-	json_datas.append(json_data)
-	valid_jsons = list()
+    json_datas = list()
+    json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
+    json_datas.append(json_data)
+    valid_jsons = list()
 
-	for json_data_ in json_datas:
-		data = json.loads(json_data_)
-		test = ActivityStream_JSON()
-		isValid = test.check_validity(data)
-		if isValid:
-			valid_jsons.append(test.get_object())
+    for json_data_ in json_datas:
+        data = json.loads(json_data_)
+        test = ActivityStream_JSON()
+        isValid = test.check_validity(data)
+        if isValid:
+            valid_jsons.append(test.get_object())
 
-
-
-
-	return render(request, 'topics/news.html', {'following': following,'userprofile': userprofile,'activity_objects': valid_jsons })
+    return render(request, 'topics/news.html', {'following': following, 'userprofile': userprofile, 'activity_objects': valid_jsons})
