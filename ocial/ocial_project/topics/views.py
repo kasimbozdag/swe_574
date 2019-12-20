@@ -1543,18 +1543,46 @@ def unfollowuser(request, username):
     userfollowing.delete()
     return redirect('userprofile', username=following.username)
 
+activityHost = "http://activity_stream:3000/"
+#activityHost = "http://127.0.0.1:3000/"
 
 @login_required
 def news(request):
     userprofile = UserProfile.objects.get(user=request.user)
-    following_q = userprofile.user.following.all()
-    following = list()
-    for following_item in following_q:
-        following.append(following_item.user)
 
+    following_q = userprofile.user.following.all()
+
+    responses = list()
+
+    print("current")
+    for usr in following_q:
+        r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + usr.following.username+"/")
+        responses.append(r)
+
+    print("following : ")
     json_datas = list()
-    json_data = '{"@context": "https://www.w3.org/ns/activitystreams", "summary": "Created a new topic", "type": "create", "actor": "John Smith", "object": "courseid_435345", "published":"2015-02-10T15:04:552"}'
-    json_datas.append(json_data)
+
+    r = requests.get(activityHost + "getAllActivities?object=" + request._current_scheme_host + "/" + request.user.username)
+    responses.append(r)
+
+    # res = response.json()
+    print(request.user)
+    print("res : ")
+    # print(res)
+    # if res is not None:
+    #		for r in res:
+    #	print(res.get(r))
+    for res in responses:
+        res = res.json()
+
+        if res is not None:
+            for r in res:
+                json_datas.append(json.dumps(res.get(r)))
+
+    # print (response.json()['-Lv1p3L2E2pR7poBug3E'])
+    # json_datas.append(json_data)
+    # json_datas.append(json_data2)
+    # json_datas.append(json.dumps(response.json()['-Lv1p3L2E2pR7poBug3E']))
     valid_jsons = list()
 
     for json_data_ in json_datas:
@@ -1564,4 +1592,4 @@ def news(request):
         if isValid:
             valid_jsons.append(test.get_object())
 
-    return render(request, 'topics/news.html', {'following': following, 'userprofile': userprofile, 'activity_objects': valid_jsons})
+    return render(request, 'topics/news.html', {'following': following_q, 'userprofile': userprofile, 'activity_objects': valid_jsons})
