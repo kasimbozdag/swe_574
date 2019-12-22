@@ -96,7 +96,7 @@ def course_post_enrolled_finished(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=UserFollowing)
-def following(sender, instance, **kwargs):
+def following(sender, instance, created, **kwargs):
     obj = instance
     scheme_host = None
     request = RequestMiddleware(get_response=None)
@@ -121,7 +121,8 @@ def following(sender, instance, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    req = requests.post(activityHost, json=activity)
+    if created:
+        req = requests.post(activityHost, json=activity)
 
 
 @receiver(post_save, sender=Section)
@@ -141,7 +142,7 @@ def sectionCreated(sender, instance, created, **kwargs):
         actor = None
     object = scheme_host + "/exploretopic/" + str(obj.id)
     type = "created"
-    summary = f"The User {user.username} created new section to course '{obj.name}'"
+    summary = f"The User {user.username} created new section '{obj.name}' to course '{obj.course.title}'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": summary,
@@ -150,7 +151,7 @@ def sectionCreated(sender, instance, created, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    if created:
+    if obj.isPublishable == True and obj.course.published == True:
         req = requests.post(activityHost, json=activity)
 
 
@@ -180,5 +181,5 @@ def courseCreated(sender, instance, created, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    if created:
+    if obj.published == True:
         req = requests.post(activityHost, json=activity)

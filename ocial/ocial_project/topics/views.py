@@ -1584,6 +1584,7 @@ def news(request):
     # json_datas.append(json_data2)
     # json_datas.append(json.dumps(response.json()['-Lv1p3L2E2pR7poBug3E']))
     valid_jsons = list()
+    jsons_to_be_sent = list()
 
     for json_data_ in json_datas:
         data = json.loads(json_data_)
@@ -1592,4 +1593,21 @@ def news(request):
         if isValid:
             valid_jsons.append(test.get_object())
 
-    return render(request, 'topics/news.html', {'following': following_q, 'userprofile': userprofile, 'activity_objects': valid_jsons})
+
+    valid_jsons.reverse()
+    for v in reversed(valid_jsons):
+        for i in range(valid_jsons.index(v)-1 ,-1 , -1):
+            print(i)
+            if(len(valid_jsons) > i):
+                print(v.summary)
+                if v.summary == valid_jsons[i].summary and v.actor == valid_jsons[i].actor and v.object == valid_jsons[i].object:
+                    #print(v.summary + " : i " + str(valid_jsons.index(v)))
+                    valid_jsons.pop(i)
+
+
+
+    for i in range(20):
+        if(len(valid_jsons) > i):
+            jsons_to_be_sent.append(valid_jsons[i])
+
+    return render(request, 'topics/news.html', {'following': following_q, 'userprofile': userprofile, 'activity_objects': jsons_to_be_sent})
