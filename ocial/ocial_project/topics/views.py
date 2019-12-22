@@ -19,6 +19,7 @@ import ssl
 from functools import reduce
 from django.db.models import Q
 from operator import or_
+from datetime import datetime
 
 
 def home(request):
@@ -1553,48 +1554,48 @@ activityHost = "http://activity_stream:3000/"
 
 @login_required
 def news(request):
+
     userprofile = UserProfile.objects.get(user=request.user)
 
-    following_q = userprofile.user.following.all()
+    get = GetActivityStream()
+    valid_jsons = get.getFollowedActivities(request) + get.getPeopleThatFollowMe(request)
 
-    responses = list()
+    jsons_to_be_sent = list()
+    valid_jsons.reverse()
+    for v in valid_jsons:
+        for i in range(valid_jsons.index(v)-1 ,-1 , -1):
+            print(i)
+            if(len(valid_jsons) > i):
+                print(v.summary)
+                if v.summary == valid_jsons[i].summary and v.actor == valid_jsons[i].actor and v.object == valid_jsons[i].object:
+                    #print(v.summary + " : i " + str(valid_jsons.index(v)))
+                    valid_jsons.pop(i)
+                    print(str(i) + " : deleted")
 
-    print("current")
-    for usr in following_q:
-        r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + usr.following.username+"/")
-        responses.append(r)
 
-    print("following : ")
-    json_datas = list()
+    new_list = list()
+    isExist = False
+    for v in reversed(valid_jsons):
+        isExist = False
+        for n in new_list:
+            if v.summary == n.summary:
+                isExist = True
+        if isExist == False:
+            new_list.append(v)
 
-    r = requests.get(activityHost + "getAllActivities?object=" + request._current_scheme_host + "/" + request.user.username)
-    responses.append(r)
 
-    # res = response.json()
-    print(request.user)
-    print("res : ")
-    # print(res)
-    # if res is not None:
-    #		for r in res:
-    #	print(res.get(r))
-    for res in responses:
-        res = res.json()
+    for i in range(20):
+        if(len(new_list) > i):
+            jsons_to_be_sent.append(new_list[i])
 
-        if res is not None:
-            for r in res:
-                json_datas.append(json.dumps(res.get(r)))
+    def takeTime(elem):
+        return datetime.strptime(elem.published,'%Y-%m-%dT%H:%M:%SZ')
 
-    # print (response.json()['-Lv1p3L2E2pR7poBug3E'])
-    # json_datas.append(json_data)
-    # json_datas.append(json_data2)
-    # json_datas.append(json.dumps(response.json()['-Lv1p3L2E2pR7poBug3E']))
-    valid_jsons = list()
+    jsons_to_be_sent.sort(key = takeTime,reverse = True)
 
-    for json_data_ in json_datas:
-        data = json.loads(json_data_)
-        test = ActivityStream_JSON()
-        isValid = test.check_validity(data)
-        if isValid:
-            valid_jsons.append(test.get_object())
 
-    return render(request, 'topics/news.html', {'following': following_q, 'userprofile': userprofile, 'activity_objects': valid_jsons})
+
+
+
+
+    return render(request, 'topics/news.html', {'userprofile': userprofile, 'activity_objects': jsons_to_be_sent})

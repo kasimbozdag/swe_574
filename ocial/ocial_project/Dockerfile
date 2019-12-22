@@ -23,5 +23,3 @@ CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
 #CMD [ "python", "manage", "runserver", ":8000" ]
 #CMD [ "flask", "run", "-h", "0.0.0.0", "-p", "5003" ]
 #CMD ["/bin/bash", "/app/docker-entrypoint.sh"]
-
-

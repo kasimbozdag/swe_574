@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models import Count
 from accounts.models import *
+import requests
+import json
 
 
 
@@ -41,13 +43,13 @@ class Course(models.Model):
 		return self.description[:200]
 
 class Learner_Course_Record(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
-    isFinished = models.BooleanField(default=False)
-    completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
+	learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+	course = models.ForeignKey(Course, on_delete=models.CASCADE)
+	isFinished = models.BooleanField(default=False)
+	completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
 
-    def __str__(self):
-        return self.learner.user.username + " - " +self.course.title
+	def __str__(self):
+		return self.learner.user.username + " - " +self.course.title
 
 class Glossary(models.Model):
 	identifier=models.CharField(max_length=32,default="")
@@ -80,13 +82,13 @@ class Section(models.Model):
 		return self.name
 
 class Learner_Section_Record(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
-    section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    isFinished = models.BooleanField(default=False)
-    completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
+	learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+	section = models.ForeignKey(Section, on_delete=models.CASCADE)
+	isFinished = models.BooleanField(default=False)
+	completeRate = models.DecimalField(default= 0, max_digits=5,decimal_places=1)
 
-    def __str__(self):
-        return self.learner.user.username + " - " +self.section.name
+	def __str__(self):
+		return self.learner.user.username + " - " +self.section.name
 
 class Lecture(models.Model):
 	title = models.CharField(max_length=200)
@@ -106,12 +108,12 @@ class Lecture(models.Model):
 		return self.title
 
 class Learner_Lecture_Record(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
-    lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
-    isFinished = models.BooleanField(default=False)
+	learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+	lecture = models.ForeignKey(Lecture, on_delete=models.CASCADE)
+	isFinished = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.learner.user.username + " - " +self.lecture.title
+	def __str__(self):
+		return self.learner.user.username + " - " +self.lecture.title
 
 class Quiz(models.Model):
 	title = models.CharField(max_length=200)
@@ -132,12 +134,12 @@ class Quiz(models.Model):
 		return self.title
 
 class Learner_Quiz_Record(models.Model):
-    learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    isFinished = models.BooleanField(default=False)
+	learner = models.ForeignKey(Learner, on_delete=models.CASCADE)
+	quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+	isFinished = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.learner.user.username + " - " +self.quiz.title
+	def __str__(self):
+		return self.learner.user.username + " - " +self.quiz.title
 
 class Question(models.Model):
 	title = models.TextField(blank=True)
@@ -203,3 +205,55 @@ class ActivityStream_JSON(models.Model):
 
 	def get_object(self):
 		return self
+
+activityHost = "http://activity_stream:3000/"
+class GetActivityStream(models.Model):
+
+	def getFollowedActivities(self,request):
+		userprofile = UserProfile.objects.get(user=request.user)
+		following_q = userprofile.user.following.all()
+		responses = list()
+		json_datas = list()
+		print("current")
+		for usr in following_q:
+			r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + usr.following.username+"/")
+			responses.append(r)
+
+		json_datas = self.convertToJson(responses)
+
+		return self.checkValidity(json_datas)
+
+
+
+
+
+	def getPeopleThatFollowMe(self,request):
+		responses = list()
+		json_datas = list()
+		r = requests.get(activityHost + "getAllActivities?object=" + request._current_scheme_host + "/" + request.user.username)
+		responses.append(r)
+		json_datas = self.convertToJson(responses)
+		return self.checkValidity(json_datas)
+
+
+	def checkValidity(self,data_list):
+		valid_jsons = list()
+		for json_data_ in data_list:
+			data = json.loads(json_data_)
+			test = ActivityStream_JSON()
+			isValid = test.check_validity(data)
+			if isValid:
+				valid_jsons.append(test.get_object())
+		return valid_jsons
+
+	def convertToJson(self,data_list):
+		print("following : ")
+		json_datas = list()
+		for res in data_list:
+			res = res.json()
+
+			if res is not None:
+				for r in res:
+					json_datas.append(json.dumps(res.get(r)))
+					#print("aaaa" + json.dumps(res.get(r)))
+		return json_datas

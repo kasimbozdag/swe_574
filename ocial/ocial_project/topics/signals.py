@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 import json
 from .middlewares import RequestMiddleware
-from .models import Topic, ActivityStream_JSON, Learner_Course_Record, UserFollowing, Section, Course
+from .models import Topic, ActivityStream_JSON, Learner_Course_Record, UserFollowing, Section, Course, GetActivityStream
 from datetime import datetime
 from django.urls import reverse
 import requests
@@ -96,7 +96,7 @@ def course_post_enrolled_finished(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=UserFollowing)
-def following(sender, instance, **kwargs):
+def following(sender, instance, created, **kwargs):
     obj = instance
     scheme_host = None
     request = RequestMiddleware(get_response=None)
@@ -121,7 +121,8 @@ def following(sender, instance, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    req = requests.post(activityHost, json=activity)
+    if created:
+        req = requests.post(activityHost, json=activity)
 
 
 @receiver(post_save, sender=Section)
@@ -139,9 +140,12 @@ def sectionCreated(sender, instance, created, **kwargs):
             actor = scheme_host + reverse("userprofile", kwargs={"username": user.username})
     else:
         actor = None
+
+
+
     object = scheme_host + "/exploretopic/" + str(obj.id)
     type = "created"
-    summary = f"The User {user.username} created new section to course '{obj.name}'"
+    summary = f"The User {user.username} created new section '{obj.name}' to course '{obj.course.title}'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": summary,
@@ -150,7 +154,15 @@ def sectionCreated(sender, instance, created, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    if created:
+
+    get = GetActivityStream()
+    valid_jsons = get.getFollowedActivities(request)
+
+    for r in valid_jsons:
+        if r.summary == summary:
+            print("daha onceden var")
+
+    if obj.isPublishable == True and obj.course.published == True:
         req = requests.post(activityHost, json=activity)
 
 
@@ -171,7 +183,7 @@ def courseCreated(sender, instance, created, **kwargs):
         actor = None
     object = scheme_host + "/exploretopic/" + str(obj.id)
     type = "created"
-    summary = f"The User {user.username} created new course to course '{obj.title}'"
+    summary = f"The User {user.username} created new course '{obj.title}'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": summary,
@@ -180,5 +192,13 @@ def courseCreated(sender, instance, created, **kwargs):
         "object": object,
         "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
     }
-    if created:
+
+    get = GetActivityStream()
+    valid_jsons = get.getFollowedActivities(request)
+
+    for r in valid_jsons:
+        if r.summary == activity["summary"]:
+            print("daha onceden var")
+
+    if obj.published == True:
         req = requests.post(activityHost, json=activity)
