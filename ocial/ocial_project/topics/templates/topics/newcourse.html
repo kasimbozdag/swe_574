@@ -4,105 +4,109 @@
 
 <style type="text/css">
     .separator {
-    display: flex;
-    align-items: center;
-    text-align: center;
-    color: #919191;
-}
-.separator::before, .separator::after {
-    content: '';
-    flex: 1;
-    border-bottom: 1px solid #ccc;
-}
-.separator::before {
-    margin-right: .25em;
-}
-.separator::after {
-    margin-left: .25em;
-}
-
-.close {display: none;}
+        display: flex;
+        align-items: center;
+        text-align: center;
+        color: #919191;
+    }
+    
+    .separator::before,
+    .separator::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #ccc;
+    }
+    
+    .separator::before {
+        margin-right: .25em;
+    }
+    
+    .separator::after {
+        margin-left: .25em;
+    }
+    
+    .close {
+        display: none;
+    }
 </style>
 
 <div class="container-fluid" style="margin-top:40px;">
 
-    {% if error %}
-
-    <div class="alert alert-danger" role="alert">
-{{error}} </div>
-    {%endif%}
-
     <form method="POST" action="{% url 'newcourse' %}" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-group">
-            <div class="row">
-                <div class="col-sm-8">
+            <ul class="list-group mt-4" id="demo2">
+                <div class="modal fade" data-keyboard="false" data-backdrop="static" id="topicModal" tabindex="1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
 
-                    <ul class="list-group mt-4" id="demo2">
-                        <div class="modal fade" data-keyboard="false" data-backdrop="static" id="topicModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">Topic</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <div class="modal-body" style="height: 200px;">
-                                        
-                                            
-                                            <select class="form-control" name="topic">
-                                                <option disabled selected value="">Select Topic</option>
-                                                {% for topic in topics.all %} {% if topic.id == course.topic.id %}
-                                                <option selected value="{{ topic.id }}">{{ topic }}</option>
-                                                {% else %}
-                                                <option value="{{ topic.id }}">{{ topic }}</option>
-                                                {% endif %} {% endfor %}
-                                            </select>
+                                <h5 class="modal-title" id="exampleModalLabel">Topic</h5>
+                            </div>
+                            {% if error %}
+                            <div class="modal-body" style="height: 250px;">
+                                <div class="alert alert-danger" role="alert">{{error}}</div>
+                                {%else%}
+                                <div class="modal-body" style="height: 200px;">
+                                    {%endif%}
+                                    <select class="form-control" name="topic">
+                                        <option disabled selected value="">Select Topic</option>
+                                        {% for topic in topics.all %} {% if topic.id == course.topic.id %}
+                                        <option selected value="{{ topic.id }}">{{ topic }}</option>
+                                        {% else %}
+                                        <option value="{{ topic.id }}">{{ topic }}</option>
+                                        {% endif %} {% endfor %}
+                                    </select>
+                                    <br/>
+                                    <div class="separator">&nbsp or &nbsp</div>
+                                    <br/>
 
-                                            <br/>
-                                            <div class="separator">&nbsp or &nbsp</div>
-                                            <br/>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" placeholder="Create New Topic" name="newtopic" aria-describedby="basic-addon2">
+                                    </div>
 
-                                            <div class="input-group mb-3">
-                                                <input type="text" class="form-control" placeholder="Create New Topic" name="newtopic" aria-describedby="basic-addon2">
-                                            </div>
-                                        
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="submit" name="close" class="btn btn-dark">Close</button>
-                                        <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#titleModal" data-whatever="@getbootstrap">Submit</button>
-                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <a class="btn btn-dark" href="{% url 'teacher' %}" role="button">Close</a>
+                                    <button type="button" class="btn btn-danger btn-block" data-toggle="modal" data-target="#titleModal" data-whatever="@getbootstrap">Submit</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                            <div class="modal fade" data-keyboard="false" data-backdrop="static" id="titleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLabel">New Course</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
+                <div class="modal fade" data-keyboard="false" data-backdrop="static" id="titleModal" tabindex="2" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">New Course</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            {% if error %}
+                            <div class="modal-body" style="height: 250px;">
+                                {%else%}
+                                <div class="modal-body" style="height: 200px;">
+                                    {%endif%}
+
+                                    <div class="input-group mb-3" style="margin-top: 60px;">
+                                        <input type="text" class="form-control" placeholder="Course Title (Required)" name="title" aria-describedby="basic-addon2" required>
                                     </div>
-                                    <div class="modal-body" style="height: 200px;">
-                                        
-                                            <div class="input-group mb-3" style="margin-top: 60px;">
-                                                <input type="text" class="form-control" placeholder="Course Title (Required)" name="title" aria-describedby="basic-addon2">
-                                            </div>
-                                       
-                                    </div>
-                                    <div class="modal-footer">
-                                         <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
-                                        <button type="submit" name="submit" class="btn btn-danger">Submit</button>
-                                    </div>
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-dark" data-dismiss="modal">Close</button>
+                                    <button type="submit" name="submit" class="btn btn-danger btn-block">Submit</button>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                    </ul>
-
+            </ul>
+        </div>
     </form>
 
     <script type="text/javascript">
@@ -111,6 +115,6 @@
         });
     </script>
 
-    </div>
+</div>
 
-    {%endblock%}
+{%endblock%}
