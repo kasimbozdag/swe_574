@@ -151,7 +151,10 @@
 
                             {% for choice in question.choice_set.all %}
                             <li class="item" data-id={{choice.id}}>
-                                <input type="radio" name="choice-radio" value="{{choice.id}}" {%if choice.isTrue==T rue%} checked="checked" {%endif%}> {{choice.title}}
+                                <input type="radio" name="choice-radio" value="{{choice.id}}" 
+                                {% if choice.isTrue %} 
+                                checked="checked" 
+                                {%endif%}> {{choice.title}}
 
                                 <button style="float: right;" type="button" onclick="window.location.href='{% url 'deletechoice' choice.id %}';" class="btn btn-pill btn-outline-dark"><i class="far fa-trash-alt"></i></button>
 
