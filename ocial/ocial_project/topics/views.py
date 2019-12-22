@@ -473,7 +473,14 @@ def teacher(request):
 def newcourse(request):
     topics = Topic.objects.all()
 
+
     if request.method == 'POST':
+        print(request.POST)
+
+        if not request.POST['newtopic'] and 'topic' not in request.POST :
+            error = "Please select or create topic."
+            return render(request, 'topics/newcourse.html', {'topics': topics,'error': error})
+
         if request.POST['newtopic']:
             try:
                 topic = Topic.objects.get(title__iexact=request.POST['newtopic'])
@@ -486,8 +493,6 @@ def newcourse(request):
             savecourse(request, course)
             return redirect('editcourse', course_id=course.id)
             print(request.POST['newtopic'])
-            return redirect('teacher')
-        elif 'close' in request.POST:
             return redirect('teacher')
         elif request.POST['topic']:
             course = Course()
