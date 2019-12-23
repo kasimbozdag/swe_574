@@ -35,7 +35,7 @@ def topic_post_save(sender, instance, **kwargs):
         return
     object = scheme_host + "/exploretopic/" + str(obj.id)
     type = "create"
-    summary = f"The User {user.username} added the topic '{obj.title}'"
+    summary = f"{user.username} added the topic '{obj.title}'"
     """
     # this part is not necessary for Topic since topic does not have an update
 
@@ -155,7 +155,7 @@ def sectionCreated(sender, instance, created, **kwargs):
 
     object = scheme_host + "/classroom/viewlecture/" + str(obj.id)
     type = "created"
-    summary = f"The User {user.username} created new section '{obj.name}' to course '{obj.course.title}'"
+    summary = f"{user.username} created new section '{obj.name}' to course '{obj.course.title}'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": summary,
@@ -194,7 +194,7 @@ def courseCreated(sender, instance, created, **kwargs):
         return
     object = scheme_host + "/course/" + str(obj.id)
     type = "created"
-    summary = f"The User {user.username} created new course '{obj.title}'"
+    summary = f"{user.username} created new course '{obj.title}'"
     activity = {
         "@context": "https://www.w3.org/ns/activitystreams",
         "summary": summary,

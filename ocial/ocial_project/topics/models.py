@@ -233,6 +233,13 @@ class GetActivityStream(models.Model):
 		json_datas = self.convertToJson(responses)
 		return self.checkValidity(json_datas)
 
+	def getActivitiesProfile(self,request,username):
+		responses = list()
+		json_datas = list()
+		r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + username + "/")
+		responses.append(r)
+		json_datas = self.convertToJson(responses)
+		return self.checkValidity(json_datas)
 
 	def getPeopleThatFollowMe(self,request):
 		responses = list()
