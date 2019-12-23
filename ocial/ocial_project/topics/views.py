@@ -1552,6 +1552,7 @@ def unfollowuser(request, username):
 activityHost = "http://activity_stream:3000/"
 #activityHost = "http://127.0.0.1:3000/"
 
+
 @login_required
 def news(request):
 
