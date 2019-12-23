@@ -2,12 +2,14 @@ import requests
 
 
 def query_common_p_o(taken, course):
+    if len(taken) == 0 or len(course) == 0:
+        return {}
     taken_sparql_id_list = ""
     for t in taken:
-        taken_sparql_id_list += " " + t
+        taken_sparql_id_list += " wd:" + t
     course_sparql_id_list = ""
     for t in course:
-        course_sparql_id_list += " " + t
+        course_sparql_id_list += " wd:" + t
 
     query = """SELECT ?ocount ?ocount1 ?pcount ?pcount1 ?scount ?scount1 WHERE {
       {
@@ -41,12 +43,15 @@ def query_common_p_o(taken, course):
 
 
 def query_most_common_p_s(taken, course):
+    if len(taken) == 0 or len(course) == 0:
+        return {}
+
     taken_sparql_id_list = ""
     for t in taken:
-        taken_sparql_id_list += " " + t
+        taken_sparql_id_list += " wd:" + t
     course_sparql_id_list = ""
     for t in course:
-        course_sparql_id_list += " " + t
+        course_sparql_id_list += " wd:" + t
     query = """
     SELECT ?ocount ?ocount1 ?pcount ?pcount1 ?scount ?scount1 WHERE {
       {
@@ -109,9 +114,11 @@ def query_most_common_p_s(taken, course):
 
 
 def query_instance_of(id_list):
+    if len(id_list) == 0:
+        return {}
     sparql_id_list = ""
     for t in id_list:
-        sparql_id_list += " " + t
+        sparql_id_list += " wd:" + t
     query = """
     SELECT DISTINCT ?b WHERE {
       VALUES ?s {""" + sparql_id_list + """
@@ -129,8 +136,10 @@ def query_instance_of(id_list):
 
 
 def common_instance_of(taken, course):
+    if len(taken) == 0 or len(course) == 0:
+        return {}
     taken_uris = query_instance_of(taken)
     course_uris = query_instance_of(course)
     common = list(set(taken_uris).intersection(course_uris))
     union = list(set(taken_uris).union(course_uris))
-    return {"common": len(common), "all": len(union), "ratio": len(common) / len(union), "taken": len(taken_uris), "course": len(course_uris)}
+    return {"common": len(common), "all": len(union), "ratio": len(common) / (len(union) or 1), "taken": len(taken_uris), "course": len(course_uris)}
