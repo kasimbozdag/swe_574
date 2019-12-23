@@ -7,13 +7,13 @@
     <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
         <div class="row no-gutters">
             <div class="col-md-2">
-                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{ userprofile.image.url }}" class="card-img rounded-0">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{userprofile.image.url}}" class="card-img rounded-0">
             </div>
             <div class="col-md-8">
                 <div class="card-body ">
 
 
-                    <a href={{  obj.actor}}><h6>{{  obj.summary }}</h6></a>
+                    <a href={{obj.actor}}><h6>{{obj.summary}}</h6></a>
 
                   <!--  <a href="{% url 'userprofile' userprofile.user.username  %}"><small class="card-text ">@{{ userprofile.user.username }}</small></a> -->
                 </div>
