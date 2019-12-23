@@ -1645,11 +1645,15 @@ def news(request):
     jsons_to_be_sent.sort(key = takeTime,reverse = True)
 
 
-
-    for j in jsons_to_be_sent:
-        str = j.actor.strip(request._current_scheme_host)
-        userprofile = UserProfile.objects.get(user__username=str)
-        j.imgUrl = userprofile.image.url
+    try:
+        for j in jsons_to_be_sent:
+            str = j.actor.strip(request._current_scheme_host)
+            userprofile = UserProfile.objects.get(user__username=str)
+            j.imgUrl = userprofile.image.url
+    except:
+        print("Sen Adminsin")
+        for j in jsons_to_be_sent:
+            j.imgUrl = "https://raw.githubusercontent.com/kasimbozdag/swe_574/master/ocial/ocial_project/ocial/static/default.jpg"
 
 
     userprofiles = list()
