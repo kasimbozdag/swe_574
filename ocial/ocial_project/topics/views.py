@@ -60,52 +60,53 @@ def userprofile(request, username):
     valid_jsons = get.getMyActivities(request)
 
     jsons_to_be_sent = list()
-    valid_jsons.reverse()
-    for v in valid_jsons:
-        for i in range(valid_jsons.index(v)-1 ,-1 , -1):
-            print(i)
-            if(len(valid_jsons) > i):
-                print(v.summary)
-                if v.summary == valid_jsons[i].summary and v.actor == valid_jsons[i].actor and v.object == valid_jsons[i].object:
-                    #print(v.summary + " : i " + str(valid_jsons.index(v)))
-                    valid_jsons.pop(i)
+    if request.user.username == username:
+
+        valid_jsons.reverse()
+        for v in valid_jsons:
+            for i in range(valid_jsons.index(v)-1 ,-1 , -1):
+                print(i)
+                if(len(valid_jsons) > i):
+                    print(v.summary)
+                    if v.summary == valid_jsons[i].summary and v.actor == valid_jsons[i].actor and v.object == valid_jsons[i].object:
+                        #print(v.summary + " : i " + str(valid_jsons.index(v)))
+                        valid_jsons.pop(i)
 
 
 
-    new_list = list()
-    isExist = False
-    for v in reversed(valid_jsons):
+        new_list = list()
         isExist = False
-        for n in new_list:
-            if v.summary == n.summary:
-                isExist = True
-        if isExist == False:
-            new_list.append(v)
+        for v in reversed(valid_jsons):
+            isExist = False
+            for n in new_list:
+                if v.summary == n.summary:
+                    isExist = True
+            if isExist == False:
+                new_list.append(v)
 
 
-    for i in range(20):
-        if(len(new_list) > i):
-            jsons_to_be_sent.append(new_list[i])
+        for i in range(20):
+            if(len(new_list) > i):
+                jsons_to_be_sent.append(new_list[i])
 
-    def takeTime(elem):
-        return datetime.strptime(elem.published,'%Y-%m-%dT%H:%M:%SZ')
+        def takeTime(elem):
+            return datetime.strptime(elem.published,'%Y-%m-%dT%H:%M:%SZ')
 
-    jsons_to_be_sent.sort(key = takeTime,reverse = True)
+        jsons_to_be_sent.sort(key = takeTime,reverse = True)
 
 
 
-    for j in jsons_to_be_sent:
-        str = j.actor.strip(request._current_scheme_host)
-        userprofile = UserProfile.objects.get(user__username=str)
-        j.imgUrl = userprofile.image.url
+        for j in jsons_to_be_sent:
+            str = j.actor.strip(request._current_scheme_host)
+            userprofile = UserProfile.objects.get(user__username=str)
+            j.imgUrl = userprofile.image.url
 
-    for j in jsons_to_be_sent:
-        if j.type == "follow":
-            jsons_to_be_sent.remove(j)
+        for j in jsons_to_be_sent:
+            if j.type == "follow":
+                jsons_to_be_sent.remove(j)
 
         for j in jsons_to_be_sent:
             j.summary = j.summary.strip("The User " + j.actor.strip(request._current_scheme_host))
-            j.summary = j.summary.strip("You ")
             j.summary = "You " + j.summary
 
     return render(request, 'topics/userprofile.html',
@@ -1623,7 +1624,6 @@ def news(request):
                 if v.summary == valid_jsons[i].summary and v.actor == valid_jsons[i].actor and v.object == valid_jsons[i].object:
                     #print(v.summary + " : i " + str(valid_jsons.index(v)))
                     valid_jsons.pop(i)
-                    print(str(i) + " : deleted")
 
 
     new_list = list()

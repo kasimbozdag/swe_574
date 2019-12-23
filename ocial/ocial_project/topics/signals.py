@@ -77,24 +77,31 @@ def course_post_enrolled_finished(sender, instance, created, **kwargs):
     else:
         actor = None
     if obj.isFinished == False and obj.completeRate <= 0 and created:
-        object = scheme_host + "/exploretopic/" + str(obj.id)
+        object = scheme_host + "/course/" + str(obj.id)
         type = "enroll"
-        summary = f"The User {user.username} enrolled in the course '{obj.course.title}'"
+        summary = f"The User {user.username} ,enrolled in the course '{obj.course.title}'"
+    elif obj.isFinished == True and obj.completeRate >= 100:
+        object = scheme_host + "/course/" + str(obj.id)
+        type = "complete"
+        summary = f"The User {user.username} completed the course '{obj.course.title}'"
+    else:
+        return
+
 
 
     #if obj.isFinished == True and obj.completeRate >= 100:
     #    object = scheme_host + "/exploretopic/" + str(obj.id)
     #    type = "completed"
     #    summary = f"The User {user.username} completed the course '{obj.course.title}'"
-        activity = {
-            "@context": "https://www.w3.org/ns/activitystreams",
-            "summary": summary,
-            "type": type,
-            "actor": actor,
-            "object": object,
-            "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
-        }
-        req = requests.post(activityHost, json=activity)
+    activity = {
+        "@context": "https://www.w3.org/ns/activitystreams",
+        "summary": summary,
+        "type": type,
+        "actor": actor,
+        "object": object,
+        "published": datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ%Z'),
+    }
+    req = requests.post(activityHost, json=activity)
 
 
 @receiver(post_save, sender=UserFollowing)
@@ -146,7 +153,7 @@ def sectionCreated(sender, instance, created, **kwargs):
 
 
 
-    object = scheme_host + "/exploretopic/" + str(obj.id)
+    object = scheme_host + "/classroom/viewlecture/" + str(obj.id)
     type = "created"
     summary = f"The User {user.username} created new section '{obj.name}' to course '{obj.course.title}'"
     activity = {
@@ -185,7 +192,7 @@ def courseCreated(sender, instance, created, **kwargs):
     else:
         actor = None
         return
-    object = scheme_host + "/exploretopic/" + str(obj.id)
+    object = scheme_host + "/course/" + str(obj.id)
     type = "created"
     summary = f"The User {user.username} created new course '{obj.title}'"
     activity = {
