@@ -32,14 +32,17 @@ def query_common_p_o(taken, course):
     }"""
     url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?format=json&query=" + query
     res = requests.get(url)
-    r = res.json()
-    results = {}
-    for var in r["head"]["vars"]:
-        results[var] = int(r["results"]["bindings"][0][var]["value"])
-        if not "1" in var:
-            results[var + "_ratio"] = int(r["results"]["bindings"][0][var]["value"]) / int(r["results"]["bindings"][0][var + "1"]["value"])
+    try:
+        r = res.json()
+        results = {}
+        for var in r["head"]["vars"]:
+            results[var] = int(r["results"]["bindings"][0][var]["value"])
+            if not "1" in var:
+                results[var + "_ratio"] = int(r["results"]["bindings"][0][var]["value"]) / int(r["results"]["bindings"][0][var + "1"]["value"])
 
-    return results
+        return results
+    except:
+        return {}
 
 
 def query_most_common_p_s(taken, course):
@@ -102,15 +105,19 @@ def query_most_common_p_s(taken, course):
     }
     """
     url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?format=json&query=" + query
-    res = requests.get(url)
-    r = res.json()
-    results = {}
-    for var in r["head"]["vars"]:
-        results[var] = int(r["results"]["bindings"][0][var]["value"])
-        if not "1" in var:
-            results[var + "_ratio"] = int(r["results"]["bindings"][0][var]["value"]) / int(r["results"]["bindings"][0][var + "1"]["value"])
 
-    return results
+    res = requests.get(url)
+    try:
+        r = res.json()
+        results = {}
+        for var in r["head"]["vars"]:
+            results[var] = int(r["results"]["bindings"][0][var]["value"])
+            if not "1" in var:
+                results[var + "_ratio"] = int(r["results"]["bindings"][0][var]["value"]) / int(r["results"]["bindings"][0][var + "1"]["value"])
+
+        return results
+    except:
+        return {}
 
 
 def query_instance_of(id_list):
