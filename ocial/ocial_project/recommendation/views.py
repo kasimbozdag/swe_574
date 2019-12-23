@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth.models import User
 from django.shortcuts import render
 
@@ -55,36 +57,42 @@ class Recommendation(View):
 
 
 class Recommendation_deneme(View):
-    def get(self, request):
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        pk = self.kwargs.get("pk")
+        courses = Learner_Course_Record.objects.filter(learner__user=user)
 
-        users = User.objects.all()
-        for user in users:
-            courses = Learner_Course_Record.objects.filter(learner__user=user)
+        taken_courses = [course.course.id for course in courses]
 
-            taken_courses = [course.course.id for course in courses]
+        labels = [label.identifier for course in courses for label in course.course.glossary_set.all()]
+        labels_name = [label.name for course in courses for label in course.course.glossary_set.all()]
+        course_labels = {}
+        course = Course.objects.get(pk=pk)
 
-            labels = [label.identifier for course in courses for label in course.course.glossary_set.all()]
-            course_labels = {}
-            courses = Course.objects.filter(published=True).exclude(id__in=taken_courses).exclude(teacher=user)
-            for course in courses:
-                c_labels = [label.identifier for label in course.glossary_set.all()]
-                course_labels[course.id] = c_labels
-            rating = {}
-            for course in course_labels:
-                r = query_common_p_o(labels, course_labels[course])
-                rating["c_p_o"] = 0
-                if r:
-                    rating["c_p_o"] = r['ocount_ratio'] + r['pcount_ratio'] + r['scount_ratio']
-                q = query_most_common_p_s(labels, course_labels[course])
+        c_labels = [label.identifier for label in course.glossary_set.all()]
+        c_labels_name = [label.name for label in course.glossary_set.all()]
+        course_labels[course.id] = c_labels
+        rating = {"labels": labels_name, course.title: c_labels_name}
+        for course in course_labels:
+            r = query_common_p_o(labels, course_labels[course])
+            rating["query_common_p_o"] = r
+            rating["c_p_o"] = 0
+            if r:
+                rating["c_p_o"] = r['ocount_ratio'] + r['pcount_ratio'] + r['scount_ratio']
+            q = query_most_common_p_s(labels, course_labels[course])
 
-                rating["c_p_s"] = 0
-                if q:
-                    rating["c_p_s"] = q['ocount_ratio'] + q['pcount_ratio'] + q['scount_ratio']
+            rating["query_most_common_p_s"] = q
+            rating["c_p_s"] = 0
+            if q:
+                rating["c_p_s"] = q['ocount_ratio'] + q['pcount_ratio'] + q['scount_ratio']
 
-                s = common_instance_of(labels, course_labels[course])
+            s = common_instance_of(labels, course_labels[course])
 
-                rating["c_i"] = 0
-                if s:
-                    rating["c_i"] = s['ratio']
-                print(user, course, rating)
-        return render(request, 'recommendation/recommendation.html', {"courses": {}})
+            rating["common_instance_of"] = s
+            rating["c_i"] = 0
+            if s:
+                rating["c_i"] = s['ratio']
+            print(user, course, rating)
+            ratingT = rating["c_p_o"] + rating["c_p_s"] + rating["c_i"]
+            rating["rating"] = ratingT
+        return render(request, 'recommendation/recommendation.html', {"courses": {}, "rating": json.dumps(rating)})
