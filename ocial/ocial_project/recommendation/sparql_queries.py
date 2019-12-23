@@ -130,9 +130,12 @@ def query_instance_of(id_list):
     """
     url = "https://query.wikidata.org/bigdata/namespace/wdq/sparql?format=json&query=" + query
     res = requests.get(url)
-    r = res.json()
-    uris = [a["b"]["value"] for a in r["results"]["bindings"]]
-    return uris
+    try:
+        r = res.json()
+        uris = [a["b"]["value"] for a in r["results"]["bindings"]]
+        return uris
+    except:
+        return []
 
 
 def common_instance_of(taken, course):
