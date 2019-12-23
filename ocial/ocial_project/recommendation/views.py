@@ -11,13 +11,12 @@ from topics.models import Course, Learner_Course_Record, UserProfile
 
 class RecommendationView(View):
     def get(self, request):
-        recommendations = Recommendation.objects.filter(user=request.user, version=1).order_by("-rating")[:10]
+        courses = Learner_Course_Record.objects.filter(learner__user=request.user)
+
+        taken_courses = [course.course.id for course in courses]
+        recommendations = Recommendation.objects.filter(user=request.user, version=1).exclude(course__in=taken_courses).order_by("-rating")[:10]
         rec_courses = [recommendation.course for recommendation in recommendations]
         if not rec_courses:
-            courses = Learner_Course_Record.objects.filter(learner__user=request.user)
-
-            taken_courses = [course.course.id for course in courses]
-
             rec_courses = Course.objects.filter(published=True).exclude(id__in=taken_courses).exclude(teacher=request.user).order_by("-pubdate")
 
         return render(request, 'recommendation/recommendation.html', {"courses": rec_courses})
