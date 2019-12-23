@@ -185,6 +185,7 @@ class ActivityStream_JSON(models.Model):
 	actor = models.CharField(max_length=200, blank=True)
 	object = models.CharField(max_length=200, blank=True)
 	published = models.CharField(max_length=200, blank=True)
+	imgUrl = models.CharField(max_length=200, blank=True)
 	keysArray = ['@context', 'summary', 'type', 'actor', 'object', 'published']
 
 
@@ -224,7 +225,13 @@ class GetActivityStream(models.Model):
 		return self.checkValidity(json_datas)
 
 
-
+	def getMyActivities(self,request):
+		responses = list()
+		json_datas = list()
+		r = requests.get(activityHost + "getAllActivities?actor=" + request._current_scheme_host + "/" + request.user.username+"/")
+		responses.append(r)
+		json_datas = self.convertToJson(responses)
+		return self.checkValidity(json_datas)
 
 
 	def getPeopleThatFollowMe(self,request):
