@@ -185,6 +185,7 @@ class ActivityStream_JSON(models.Model):
 	actor = models.CharField(max_length=200, blank=True)
 	object = models.CharField(max_length=200, blank=True)
 	published = models.CharField(max_length=200, blank=True)
+	imgUrl = models.CharField(max_length=200, blank=True)
 	keysArray = ['@context', 'summary', 'type', 'actor', 'object', 'published']
 
 

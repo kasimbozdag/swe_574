@@ -1596,7 +1596,13 @@ def news(request):
 
 
 
+    for j in jsons_to_be_sent:
+        str = j.actor.strip("http://127.0.0.1:8002/")
+        userprofile = UserProfile.objects.get(user__username=str)
+        j.imgUrl = userprofile.image.url
 
+
+    userprofiles = list()
 
 
     return render(request, 'topics/news.html', {'userprofile': userprofile, 'activity_objects': jsons_to_be_sent})

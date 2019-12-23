@@ -4,10 +4,11 @@
   <tr><td align="center">
     &nbsp;
 {% for obj in activity_objects %}
+
     <div class="card mb-7" style="margin-bottom:20px; max-height: 150px;">
         <div class="row no-gutters">
             <div class="col-md-2">
-                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{userprofile.image.url}}" class="card-img rounded-0">
+                <img style="object-fit: cover; height: 100px; width: 100px;" src="{{obj.imgUrl}}" class="card-img rounded-0">
             </div>
             <div class="col-md-8">
                 <div class="card-body ">
