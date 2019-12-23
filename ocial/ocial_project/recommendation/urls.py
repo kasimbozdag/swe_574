@@ -3,5 +3,5 @@ from .views import *
 
 urlpatterns = [
     url(r"list/", RecommendationView.as_view(), name="recommendation-list"),
-    url(r"deneme/", Recommendation_deneme.as_view(), name="recommendation-deneme")
+    url(r"(?P<pk>[0-9])/", Recommendation_deneme.as_view(), name="recommendation-deneme")
 ]
