@@ -1,4 +1,5 @@
 import django
+import time
 
 django.setup()
 from django.contrib.auth.models import User
@@ -23,6 +24,7 @@ def scheduled():
         rating = {}
 
         for course in course_labels:
+            time.sleep(10)
             r = query_common_p_o(labels, course_labels[course])
             rating["c_p_o"] = 0
             if r:
