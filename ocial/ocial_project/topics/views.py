@@ -1652,6 +1652,8 @@ def news(request):
             j.imgUrl = userprofile.image.url
     except:
         print("Sen Adminsin")
+        for j in jsons_to_be_sent:
+            j.imgUrl = "https://raw.githubusercontent.com/kasimbozdag/swe_574/master/ocial/ocial_project/ocial/static/default.jpg"
 
 
     userprofiles = list()
