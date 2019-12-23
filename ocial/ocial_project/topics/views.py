@@ -96,8 +96,6 @@ def userprofile(request, username):
 
 
     for j in jsons_to_be_sent:
-        str = j.actor.strip(request._current_scheme_host)
-        userprofile = UserProfile.objects.get(user__username=str)
         j.imgUrl = userprofile.image.url
 
     for j in jsons_to_be_sent:
